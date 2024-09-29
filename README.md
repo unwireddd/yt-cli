@@ -1,6 +1,6 @@
 # yt-cli
 Terminal-based Youtube player.
-
+<img src="./sample.gif"></img>
 
 
 
