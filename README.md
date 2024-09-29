@@ -1,5 +1,5 @@
 # yt-cli
-Terminal-based Youtube player.
+Terminal-based Youtube player. <br>
 <img src="./sample.gif"></img>
 
 
