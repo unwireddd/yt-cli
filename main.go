@@ -10,9 +10,11 @@ import (
 	"github.com/anaskhan96/soup"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/inancgumus/screen"
 )
 
 func main() {
+	screen.Clear()
 	var m tea.Model
 	var items []list.Item
 	var itemstwo []list.Item
@@ -47,7 +49,12 @@ func main() {
 	for _, match := range matches {
 
 		match = strings.Replace(match, "<a href=", "", -1)
-		match = strings.Replace(match, `><p dir="auto">`, "			", -1)
+		if video < 10 {
+			match = strings.Replace(match, `><p dir="auto">`, "			", -1)
+		} else {
+			match = strings.Replace(match, `><p dir="auto">`, "       ", -1)
+		}
+		//match = strings.Replace(match, `><p dir="auto">`, "			", -1)
 		match = strings.Replace(match, `</p></a>`, "", -1)
 		match = strings.Replace(match, `"`, "", -1)
 		match = strings.Replace(match, `/`, fmt.Sprintf("https://www.youtube.com/"), -1)
@@ -58,7 +65,11 @@ func main() {
 		video = video + 1
 	}
 
-	for i := 0; i < 30; i++ {
+	for i, str := range mecze {
+		mecze[i] = strings.ReplaceAll(str, "&#39;", "")
+	}
+
+	for i := range mecze {
 		itemstwo = append(itemstwo, item(mecze[i]))
 	}
 
@@ -76,5 +87,4 @@ func main() {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
 	}
-
 }
