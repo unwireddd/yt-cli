@@ -13,6 +13,11 @@ import (
 	"github.com/inancgumus/screen"
 )
 
+func removeFirstAlphanumeric(s string) string {
+	re := regexp.MustCompile(`^[a-zA-Z0-9_\-]+`)
+	return re.ReplaceAllString(s, "")
+}
+
 func main() {
 	screen.Clear()
 	var m tea.Model
@@ -58,9 +63,15 @@ func main() {
 		match = strings.Replace(match, `</p></a>`, "", -1)
 		match = strings.Replace(match, `"`, "", -1)
 		match = strings.Replace(match, `/`, fmt.Sprintf("https://www.youtube.com/"), -1)
-		mecze = append(mecze, match)
 		cutter := regexp.MustCompile(`https?://[^\s]+`)
 		link := cutter.FindString(match)
+		match = strings.Replace(match, `https://www.youtube.com/`, fmt.Sprintf(""), -1)
+		match = strings.Replace(match, "watch?v=", "", 1)
+		match = removeFirstAlphanumeric(match)
+		match = strings.TrimSpace(match)
+
+		mecze = append(mecze, match)
+
 		videos[match] = link
 		video = video + 1
 	}
