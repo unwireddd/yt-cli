@@ -6,6 +6,8 @@ import (
 	"os/exec"
 	"strings"
 
+	//"os"
+
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -14,13 +16,14 @@ import (
 var url string
 var video int
 var videos map[string]string = make(map[string]string)
+var globaltest string
 
-const listHeight = 14
+const listHeight = 30
 
 var (
 	titleStyle        = lipgloss.NewStyle().MarginLeft(2)
 	itemStyle         = lipgloss.NewStyle().PaddingLeft(4)
-	selectedItemStyle = lipgloss.NewStyle().PaddingLeft(2).Foreground(lipgloss.Color("#70A3CC"))
+	selectedItemStyle = lipgloss.NewStyle().PaddingLeft(2).Foreground(lipgloss.Color("#C724B1"))
 	paginationStyle   = list.DefaultStyles().PaginationStyle.PaddingLeft(4)
 	helpStyle         = list.DefaultStyles().HelpStyle.PaddingLeft(4).PaddingBottom(1)
 	quitTextStyle     = lipgloss.NewStyle().Margin(1, 0, 2, 4)
@@ -139,6 +142,7 @@ func (m modeltwo) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m modeltwo) View() string {
+	globaltest = m.choice
 	var ok bool
 
 	url, ok = videos[m.choice]
@@ -146,6 +150,98 @@ func (m modeltwo) View() string {
 		testt := exec.Command("mpv", url)
 		testt.Run()
 		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
+	}
+	if m.quitting {
+		return quitTextStyle.Render("Don't want to watch? That’s cool.")
+	}
+	return "\n" + m.list.View()
+}
+
+//third list start
+
+type modelthree struct {
+	list     list.Model
+	choice   string
+	quitting bool
+}
+
+func (m modelthree) Init() tea.Cmd {
+	return nil
+}
+
+func (m modelthree) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.list.SetWidth(msg.Width)
+		return m, nil
+
+	case tea.KeyMsg:
+		switch keypress := msg.String(); keypress {
+		case "q", "ctrl+c":
+			m.quitting = true
+			return m, tea.Quit
+
+		case "enter":
+			i, ok := m.list.SelectedItem().(item)
+			if ok {
+				m.choice = string(i)
+			}
+			return m, tea.Quit
+		}
+	}
+
+	var cmd tea.Cmd
+	m.list, cmd = m.list.Update(msg)
+	return m, cmd
+}
+
+func (m modelthree) View() string {
+
+	if m.choice == "Play next video" {
+
+		var index int
+		for i, value := range itemki {
+			if value == globaltest {
+				index = i
+				break
+			}
+		}
+		index = index + 1
+		m.choice = itemki[index]
+		url = videos[m.choice]
+		testt := exec.Command("mpv", url)
+		testt.Run()
+		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
+	}
+
+	if m.choice == "Play previous video" {
+
+		var index int
+		for i, value := range itemki {
+			if value == globaltest {
+				index = i
+				break
+			}
+		}
+
+		if index == 0 {
+			return quitTextStyle.Render(fmt.Sprintf("%s? I can't see any previous video.", m.choice))
+		}
+		index = index - 1
+		m.choice = itemki[index]
+		url = videos[m.choice]
+		testt := exec.Command("mpv", url)
+		testt.Run()
+		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
+	}
+
+	if m.choice == "Quit" {
+		fmt.Println("Quitting...")
+		return "ok"
+	}
+	if m.choice == "Go back to videos list" {
+		fmt.Println("Quitting...")
+		return "ok"
 	}
 	if m.quitting {
 		return quitTextStyle.Render("Don't want to watch? That’s cool.")
