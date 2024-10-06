@@ -1,3 +1,10 @@
+/*
+TODO:
+-zrobic "Go back to videos list"
+-naprawic to ze filmik za kadyzm razem sie odpala 2 razy z jakiegos powodu
+-
+*/
+
 package main
 
 import (
@@ -13,6 +20,10 @@ import (
 	"github.com/inancgumus/screen"
 )
 
+var lista []list.Item
+var itemki []string
+var itemstwo []list.Item
+
 func removeFirstAlphanumeric(s string) string {
 	re := regexp.MustCompile(`^[a-zA-Z0-9_\-]+`)
 	return re.ReplaceAllString(s, "")
@@ -22,7 +33,12 @@ func main() {
 	screen.Clear()
 	var m tea.Model
 	var items []list.Item
-	var itemstwo []list.Item
+	itemsthree := []list.Item{
+		item("Play next video"),
+		item("Play previous video"),
+		item("Go back to videos list"),
+		item("Quit"),
+	}
 	var mecze []string
 
 	for t := range maps.Keys(channels) {
@@ -82,6 +98,7 @@ func main() {
 
 	for i := range mecze {
 		itemstwo = append(itemstwo, item(mecze[i]))
+		itemki = append(itemki, mecze[i])
 	}
 
 	l = list.New(itemstwo, itemDelegate{}, defaultWidth, listHeight)
@@ -93,6 +110,22 @@ func main() {
 	l.Styles.HelpStyle = helpStyle
 
 	m = modeltwo{list: l}
+
+	if _, err := tea.NewProgram(m.(tea.Model)).Run(); err != nil {
+		fmt.Println("Error running program:", err)
+		os.Exit(1)
+	}
+
+	l = list.New(itemsthree, itemDelegate{}, defaultWidth, listHeight)
+	l.Title = "Select option"
+	l.SetShowStatusBar(false)
+	l.SetFilteringEnabled(false)
+	l.Styles.Title = titleStyle
+	l.Styles.PaginationStyle = paginationStyle
+	l.Styles.HelpStyle = helpStyle
+	screen.Clear()
+
+	m = modelthree{list: l}
 
 	if _, err := tea.NewProgram(m.(tea.Model)).Run(); err != nil {
 		fmt.Println("Error running program:", err)
