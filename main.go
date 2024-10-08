@@ -1,10 +1,3 @@
-/*
-TODO:
--zrobic "Go back to videos list"
--naprawic to ze filmik za kadyzm razem sie odpala 2 razy z jakiegos powodu
--
-*/
-
 package main
 
 import (
@@ -30,6 +23,7 @@ func removeFirstAlphanumeric(s string) string {
 }
 
 func main() {
+
 	screen.Clear()
 	var m tea.Model
 	var items []list.Item
@@ -37,13 +31,14 @@ func main() {
 		item("Play next video"),
 		item("Play previous video"),
 		item("Go back to videos list"),
-		item("Quit"),
 	}
 	var mecze []string
 
 	for t := range maps.Keys(channels) {
 		items = append(items, item(t))
 	}
+
+	items = append(items, item("Search"))
 
 	const defaultWidth = 20
 
@@ -62,9 +57,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	ator, _ := soup.Get(url)
+	ator, _ := soup.Get(link)
 	atorvid := soup.HTMLParse(ator)
-	owtput := atorvid.Find("div", "class", "pure-g").HTML()
+	owtput := atorvid.Find("div", "class", "pure-g").HTML() // Generalnie jak jest wyszukiwanie to pewnie ma inna strukture htmlowa wiec trzeba to w ogole przepisac czy cos
 	re := regexp.MustCompile(`<a[^>]*>.*?<p dir="auto">.*?</p>.*?</a>`)
 	matches := re.FindAllString(owtput, -1)
 	for _, match := range matches {
@@ -94,12 +89,14 @@ func main() {
 
 	for i, str := range mecze {
 		mecze[i] = strings.ReplaceAll(str, "&#39;", "")
+		mecze[i] = strings.ReplaceAll(str, "&#34;", "")
 	}
 
 	for i := range mecze {
 		itemstwo = append(itemstwo, item(mecze[i]))
 		itemki = append(itemki, mecze[i])
 	}
+x:
 
 	l = list.New(itemstwo, itemDelegate{}, defaultWidth, listHeight)
 	l.Title = "Select the video you'd like to watch"
@@ -131,4 +128,8 @@ func main() {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
 	}
+	if testowanie == "Go back to videos list" {
+		goto x
+	}
+
 }
