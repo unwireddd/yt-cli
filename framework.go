@@ -3,8 +3,12 @@ package main
 import (
 	"fmt"
 	"io"
+	"log"
+	"net/url"
+	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	//"os"
 
@@ -13,10 +17,24 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-var url string
+var link string
 var video int
 var videos map[string]string = make(map[string]string)
 var globaltest string
+var testowanie string
+
+func restart() {
+	args := os.Args
+	cmd := exec.Command(args[0], args[1:]...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Start()
+	if err != nil {
+		log.Fatal(err)
+	}
+	time.Sleep(1 * time.Second) // wait for the new process to start
+	os.Exit(0)
+}
 
 const listHeight = 30
 
@@ -95,7 +113,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	var ok bool
 
-	url, ok = channels[m.choice]
+	if m.choice == "Search" {
+		text := "linux"
+		encodedText := url.QueryEscape(text)
+		link = "https://iv.nboeck.de/search?q=" + encodedText
+		fmt.Println(link)
+	}
+
+	link, ok = channels[m.choice]
 	if ok {
 		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
 	}
@@ -145,9 +170,9 @@ func (m modeltwo) View() string {
 	globaltest = m.choice
 	var ok bool
 
-	url, ok = videos[m.choice]
+	link, ok = videos[m.choice]
 	if ok {
-		testt := exec.Command("mpv", url)
+		testt := exec.Command("mpv", link)
 		testt.Run()
 		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
 	}
@@ -179,6 +204,7 @@ func (m modelthree) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch keypress := msg.String(); keypress {
 		case "q", "ctrl+c":
 			m.quitting = true
+			log.Fatal()
 			return m, tea.Quit
 
 		case "enter":
@@ -208,8 +234,8 @@ func (m modelthree) View() string {
 		}
 		index = index + 1
 		m.choice = itemki[index]
-		url = videos[m.choice]
-		testt := exec.Command("mpv", url)
+		link = videos[m.choice]
+		testt := exec.Command("mpv", link)
 		testt.Run()
 		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
 	}
@@ -229,18 +255,14 @@ func (m modelthree) View() string {
 		}
 		index = index - 1
 		m.choice = itemki[index]
-		url = videos[m.choice]
-		testt := exec.Command("mpv", url)
+		link = videos[m.choice]
+		testt := exec.Command("mpv", link)
 		testt.Run()
 		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
 	}
 
-	if m.choice == "Quit" {
-		fmt.Println("Quitting...")
-		return "ok"
-	}
 	if m.choice == "Go back to videos list" {
-		fmt.Println("Quitting...")
+		testowanie = m.choice
 		return "ok"
 	}
 	if m.quitting {
