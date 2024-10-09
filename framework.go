@@ -13,15 +13,77 @@ import (
 	//"os"
 
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/inancgumus/screen"
 )
 
 var link string
+var text string
 var video int
 var videos map[string]string = make(map[string]string)
 var globaltest string
 var testowanie string
+
+// test model4
+
+type (
+	errMsg error
+)
+
+type modelfour struct {
+	textInput textinput.Model
+	err       error
+}
+
+func initialModel() modelfour {
+	ti := textinput.New()
+	ti.Placeholder = "Linux"
+	ti.Focus()
+	ti.CharLimit = 156
+	ti.Width = 20
+
+	return modelfour{
+		textInput: ti,
+		err:       nil,
+	}
+}
+
+func (m modelfour) Init() tea.Cmd {
+	return textinput.Blink
+}
+
+func (m modelfour) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmd tea.Cmd
+
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.Type {
+		case tea.KeyEnter, tea.KeyCtrlC, tea.KeyEsc:
+			return m, tea.Quit
+		}
+
+	// We handle errors just like any other message
+	case errMsg:
+		m.err = msg
+		return m, nil
+	}
+
+	m.textInput, cmd = m.textInput.Update(msg)
+	return m, cmd
+}
+
+func (m modelfour) View() string {
+	text = m.textInput.Value()
+	return fmt.Sprintf(
+		"Search:\n\n%s\n\n%s",
+		m.textInput.View(),
+		"(esc to quit)",
+	) + "\n"
+}
+
+// end test modelfour
 
 func restart() {
 	args := os.Args
@@ -113,11 +175,24 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	var ok bool
 
+	if m.choice == "Test" {
+		channels["testowanko"] = "https://iv.nboeck.de/channel/UCxJDH_2HXzwUtT62HgWJqCg"
+		link = channels["testowanko"]
+		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
+	}
+
 	if m.choice == "Search" {
-		text := "linux"
+		screen.Clear()
+
+		p := tea.NewProgram(initialModel())
+		if _, err := p.Run(); err != nil {
+			log.Fatal(err)
+		}
+
 		encodedText := url.QueryEscape(text)
 		link = "https://iv.nboeck.de/search?q=" + encodedText
 		fmt.Println(link)
+		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
 	}
 
 	link, ok = channels[m.choice]
