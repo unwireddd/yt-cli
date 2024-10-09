@@ -39,6 +39,7 @@ func main() {
 	}
 
 	items = append(items, item("Search"))
+	items = append(items, item("Test"))
 
 	const defaultWidth = 20
 
@@ -59,7 +60,7 @@ func main() {
 
 	ator, _ := soup.Get(link)
 	atorvid := soup.HTMLParse(ator)
-	owtput := atorvid.Find("div", "class", "pure-g").HTML() // Generalnie jak jest wyszukiwanie to pewnie ma inna strukture htmlowa wiec trzeba to w ogole przepisac czy cos
+	owtput := atorvid.Find("div", "class", "pure-g").HTML()
 	re := regexp.MustCompile(`<a[^>]*>.*?<p dir="auto">.*?</p>.*?</a>`)
 	matches := re.FindAllString(owtput, -1)
 	for _, match := range matches {
