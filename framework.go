@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"log"
+	"maps"
 	"net/url"
 	"os"
 	"os/exec"
@@ -25,6 +27,9 @@ var video int
 var videos map[string]string = make(map[string]string)
 var globaltest string
 var testowanie string
+var titleLinkMap = make(map[string]string)
+var itemshist []list.Item
+var isHistory bool
 
 // test model4
 
@@ -136,75 +141,6 @@ func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 	fmt.Fprint(w, fn(str))
 }
 
-type model struct {
-	list     list.Model
-	choice   string
-	quitting bool
-}
-
-func (m model) Init() tea.Cmd {
-	return nil
-}
-
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
-	case tea.WindowSizeMsg:
-		m.list.SetWidth(msg.Width)
-		return m, nil
-
-	case tea.KeyMsg:
-		switch keypress := msg.String(); keypress {
-		case "q", "ctrl+c":
-			m.quitting = true
-			return m, tea.Quit
-
-		case "enter":
-			i, ok := m.list.SelectedItem().(item)
-			if ok {
-				m.choice = string(i)
-			}
-			return m, tea.Quit
-		}
-	}
-
-	var cmd tea.Cmd
-	m.list, cmd = m.list.Update(msg)
-	return m, cmd
-}
-
-func (m model) View() string {
-	var ok bool
-
-	if m.choice == "Test" {
-		channels["testowanko"] = "https://iv.nboeck.de/channel/UCxJDH_2HXzwUtT62HgWJqCg"
-		link = channels["testowanko"]
-		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
-	}
-
-	if m.choice == "Search" {
-		screen.Clear()
-
-		p := tea.NewProgram(initialModel())
-		if _, err := p.Run(); err != nil {
-			log.Fatal(err)
-		}
-
-		encodedText := url.QueryEscape(text)
-		link = "https://iv.nboeck.de/search?q=" + encodedText
-		fmt.Println(link)
-		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
-	}
-
-	link, ok = channels[m.choice]
-	if ok {
-		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
-	}
-	if m.quitting {
-		return quitTextStyle.Render("Don't want to watch? That’s cool.")
-	}
-	return "\n" + m.list.View()
-}
-
 type modeltwo struct {
 	list     list.Model
 	choice   string
@@ -244,8 +180,27 @@ func (m modeltwo) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m modeltwo) View() string {
 	globaltest = m.choice
 	var ok bool
+	filePath := "history"
 
 	link, ok = videos[m.choice]
+
+	for key, value := range videos {
+		if value == link {
+			fmt.Printf("The key associated with the value '%s' is '%s'\n", link, key)
+			combinated := fmt.Sprintf("%s - %s\n", key, link)
+			file, err := os.OpenFile(filePath, os.O_APPEND|os.O_WRONLY, 0644)
+			if err != nil {
+				panic(err)
+			}
+			defer file.Close()
+
+			_, err = io.WriteString(file, combinated)
+			if err != nil {
+				panic(err)
+			}
+		}
+	}
+
 	if ok {
 		testt := exec.Command("mpv", link)
 		testt.Run()
@@ -257,7 +212,144 @@ func (m modeltwo) View() string {
 	return "\n" + m.list.View()
 }
 
-//third list start
+type model struct {
+	list     list.Model
+	choice   string
+	quitting bool
+}
+
+func (m model) Init() tea.Cmd {
+	return nil
+}
+
+func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.list.SetWidth(msg.Width)
+		return m, nil
+
+	case tea.KeyMsg:
+		switch keypress := msg.String(); keypress {
+		case "q", "ctrl+c":
+			m.quitting = true
+			return m, tea.Quit
+
+		case "enter":
+			i, ok := m.list.SelectedItem().(item)
+			if ok {
+				m.choice = string(i)
+			}
+			return m, tea.Quit
+		}
+	}
+
+	var cmd tea.Cmd
+	m.list, cmd = m.list.Update(msg)
+	return m, cmd
+}
+
+func (m model) View() string {
+	var ok bool
+
+	if m.choice == "Add / Remove a channel" {
+		p := tea.NewProgram(initialModel())
+		if _, err := p.Run(); err != nil {
+			log.Fatal(err)
+		}
+		channels[text] = "https://iv.nboeck.de/channel/UCxJDH_2HXzwUtT62HgWJqCg"
+		link = channels["testowanko"]
+		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
+	}
+
+	if m.choice == "Search" {
+		screen.Clear()
+
+		p := tea.NewProgram(initialModel())
+		if _, err := p.Run(); err != nil {
+			log.Fatal(err)
+		}
+
+		if m.choice == "Add" {
+			cmd := exec.Command("vim", "channels.go")
+			cmd.Run()
+			return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
+		}
+
+		encodedText := url.QueryEscape(text)
+		link = "https://iv.nboeck.de/search?q=" + encodedText
+		fmt.Println(link)
+		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
+	}
+
+	if m.choice == "History" {
+		isHistory = true
+		/*screen.Clear()
+		data, err := ioutil.ReadFile("history")
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(data))
+		os.Exit(0)
+		*/
+
+		file, _ := os.Open("history")
+		defer file.Close()
+
+		scanner := bufio.NewScanner(file)
+
+		for scanner.Scan() {
+			line := scanner.Text()
+			parts := strings.SplitN(line, " - ", 2)
+			if len(parts) != 2 {
+				fmt.Printf("Skipping invalid line: %s\n", line)
+				continue
+			}
+
+			title := parts[0]
+			link := parts[1]
+
+			titleLinkMap[title] = link
+			for t := range maps.Keys(titleLinkMap) {
+				itemshist = append(itemshist, item(t))
+			}
+		}
+
+		/*
+			l := list.New(itemshist, itemDelegate{}, 17, listHeight)
+			l.Title = "Select the channel you'd like to watch"
+			l.SetShowStatusBar(false)
+			l.SetFilteringEnabled(false)
+			l.Styles.Title = titleStyle
+			l.Styles.PaginationStyle = paginationStyle
+			l.Styles.HelpStyle = helpStyle
+
+			m = model{list: l} // tutaj jestem w modelu model i on sam siebie wywoluje
+
+			if _, err := tea.NewProgram(m).Run(); err != nil {
+				fmt.Println("Error running program:", err)
+				os.Exit(1)
+			}
+		*/
+
+		for title, link := range titleLinkMap {
+			fmt.Printf("%s: %s\n", title, link)
+		}
+		link = "https://iv.nboeck.de/channel/UC7YOGHUfC1Tb6E4pudI9STA"
+
+		// to nie bedzie dzialac bo w mainie jest przeciez scrapowanie tego wszystkiego wiec trzeba pewnie zrobic jakis if statement i tam mecze to beda inaczej wyciagane w ogole
+
+		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
+	}
+
+	link, ok = channels[m.choice]
+	if ok {
+		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
+	}
+	if m.quitting {
+		return quitTextStyle.Render("Don't want to watch? That’s cool.")
+	}
+	return "\n" + m.list.View()
+}
 
 type modelthree struct {
 	list     list.Model
@@ -300,6 +392,22 @@ func (m modelthree) View() string {
 
 	if m.choice == "Play next video" {
 
+		for key, value := range videos {
+			if value == link {
+				combinated := fmt.Sprintf("%s - %s\n", key, link)
+				file, err := os.OpenFile("history", os.O_APPEND|os.O_WRONLY, 0644)
+				if err != nil {
+					panic(err)
+				}
+				defer file.Close()
+
+				_, err = io.WriteString(file, combinated)
+				if err != nil {
+					panic(err)
+				}
+			}
+		}
+
 		var index int
 		for i, value := range itemki {
 			if value == globaltest {
@@ -316,6 +424,22 @@ func (m modelthree) View() string {
 	}
 
 	if m.choice == "Play previous video" {
+
+		for key, value := range videos {
+			if value == link {
+				fmt.Printf("The key associated with the value '%s' is '%s'\n", link, key)
+				combinated := fmt.Sprintf("%s - %s\n", key, link)
+				file, err := os.OpenFile("history", os.O_APPEND|os.O_WRONLY, 0644)
+				if err != nil {
+					panic(err)
+				}
+				defer file.Close()
+				_, err = io.WriteString(file, combinated)
+				if err != nil {
+					panic(err)
+				}
+			}
+		}
 
 		var index int
 		for i, value := range itemki {
