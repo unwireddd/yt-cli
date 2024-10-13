@@ -186,7 +186,7 @@ func (m modeltwo) View() string {
 
 	for key, value := range videos {
 		if value == link {
-			fmt.Printf("The key associated with the value '%s' is '%s'\n", link, key)
+			//fmt.Printf("The key associated with the value '%s' is '%s'\n", link, key)
 			combinated := fmt.Sprintf("%s - %s\n", key, link)
 			file, err := os.OpenFile(filePath, os.O_APPEND|os.O_WRONLY, 0644)
 			if err != nil {
@@ -282,17 +282,10 @@ func (m model) View() string {
 	}
 
 	if m.choice == "History" {
+		rmDuplicates()
 		isHistory = true
-		/*screen.Clear()
-		data, err := ioutil.ReadFile("history")
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println(string(data))
-		os.Exit(0)
-		*/
 
-		file, _ := os.Open("history")
+		file, _ := os.Open("output.txt")
 		defer file.Close()
 
 		scanner := bufio.NewScanner(file)
@@ -301,7 +294,7 @@ func (m model) View() string {
 			line := scanner.Text()
 			parts := strings.SplitN(line, " - ", 2)
 			if len(parts) != 2 {
-				fmt.Printf("Skipping invalid line: %s\n", line)
+				//fmt.Printf("Skipping invalid line: %s\n", line)
 				continue
 			}
 
@@ -427,7 +420,7 @@ func (m modelthree) View() string {
 
 		for key, value := range videos {
 			if value == link {
-				fmt.Printf("The key associated with the value '%s' is '%s'\n", link, key)
+				//fmt.Printf("The key associated with the value '%s' is '%s'\n", link, key)
 				combinated := fmt.Sprintf("%s - %s\n", key, link)
 				file, err := os.OpenFile("history", os.O_APPEND|os.O_WRONLY, 0644)
 				if err != nil {
