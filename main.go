@@ -39,9 +39,6 @@ func main() {
 	}
 
 	items = append(items, item("Search"))
-	items = append(items, item("Test"))
-	items = append(items, item("Add"))
-	items = append(items, item("Add / Remove a channel"))
 	items = append(items, item("History"))
 
 	const defaultWidth = 20
@@ -99,6 +96,7 @@ func main() {
 	}
 
 	for i, str := range mecze {
+		mecze[i] = strings.ReplaceAll(str, "&#39;", "")
 		mecze[i] = strings.ReplaceAll(str, "&#39;", "")
 		mecze[i] = strings.ReplaceAll(str, "&#34;", "")
 	}
@@ -158,5 +156,5 @@ x:
 	if testowanie == "Go back to videos list" {
 		goto x
 	}
-
+	os.Remove("output.txt")
 }
