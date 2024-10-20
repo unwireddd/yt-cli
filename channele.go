@@ -1,11 +1,3 @@
-// to normalnie dziala jak cos i zamienia to z channels.txt na poprawna mapke z go
-/*
-W sumie to do channels.txt mozna tez dodac subskrybcje z channels.go i jak mam plik tekstowy to niech on sie zwyczajnie konwertuje na plik go za kazdym odpaleniem
-czy cos w tym stylu
-
-also mozliwe ze on tez w sumie nie powinien mi generowac mapki z go tylko elementy i potem je jakos appendowac na samym poczatku go channels.go czy cos takiego
-*/
-
 package main
 
 import (

@@ -10,7 +10,6 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"time"
 
 	//"os"
 
@@ -90,10 +89,6 @@ func (m modelfour) View() string {
 	) + "\n"
 }
 
-// end test modelfour
-
-// test modelfive
-
 type modelfive struct {
 	textInput textinput.Model
 	err       error
@@ -126,7 +121,6 @@ func (m modelfive) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 
-	// We handle errors just like any other message
 	case errMsg:
 		m.err = msg
 		return m, nil
@@ -137,27 +131,15 @@ func (m modelfive) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m modelfive) View() string {
+	if m.textInput.Value() == "" {
+		return "This pool cannot be empty"
+	}
 	text2 = m.textInput.Value()
 	return fmt.Sprintf(
 		"Search:\n\n%s\n\n%s",
 		m.textInput.View(),
 		"(esc to quit)",
 	) + "\n"
-}
-
-// end test modelfive
-
-func restart() {
-	args := os.Args
-	cmd := exec.Command(args[0], args[1:]...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	err := cmd.Start()
-	if err != nil {
-		log.Fatal(err)
-	}
-	time.Sleep(1 * time.Second) // wait for the new process to start
-	os.Exit(0)
 }
 
 const listHeight = 30
@@ -319,42 +301,20 @@ func (m model) View() string {
 			log.Fatal(err)
 		}
 		channels[text] = text2
-		// tutaj sie dodaje text w sensie nazwa kanalu i jakis losowy link niezalezny od niczego
-		// mozna w sumie zrobic osobny parser dla kanalow i pokazuje pierwszy znaleziony
-		// albo w sumie chuj w ostatecznosci moge tez pytac o link i w ten sposob dodawac i zapisywac to w tekscie a potem appendowac za kadzym odpaleniem
 		toSubs = fmt.Sprintf("%s	%s ", text, text2)
-		// poki co jest w takim formacie ale to nic mozna potem cos wykombinowac ai zapytac zeby to zmienic na format mapkowy
-		// teraz najwiekszy problem to te jebane zapytania we frameworku co sie wyswietlaja 2 razy z jakiegos powodu
-		// to zapytanie o kanal w ogole chyba 2 razy to zapisuje w pliku jak sie cos faktycznie wpisze 2 razy w zapytaniu
+		// for now the biggest problem is that those input models in framework are displayed 2 times Idk why
 		file, err := os.OpenFile("channels.md", os.O_APPEND|os.O_WRONLY, 0644)
 		if err != nil {
 			panic(err)
 		}
 		defer file.Close()
 
-		// Write the content to the file
 		_, err = file.WriteString(toSubs)
-		//_, err = file.WriteString("\n")
 
-		//_, err = file.WriteString("\n")
-		// zeby to dobrze dzialalo to trzeba zeby kazdy zestaw link + kanal byl razem w osobnej linii i wtedy bedzie git
-
-		// !!! mozna zmienic format pliku z .txt na .md to wtedy bedzie czytac htmlowy syntax tylko nie wiadomo czy skrypt bedzie to obslugiwal wtedy
-		// i chuj niby dalej jest to w nowej linii nie wiem czemu
-
-		// !!!
-		// moge teoretycznie napisac osobny skrypt do przerabiania pliku .md zeby byl wlasciwy format ale nie wiem czy to dobry pomysl
-		// dobra to dziala i jest normalnie w output.md
-
-		// dalej jest zle ale mozna sie spytac ai zeby mi
-		// text2 to link ktory faktycznie sie gdzies zapisuje dopiero w drugim zapytaniu
-		// text to nazwa ktora zapisuje sie w pierwszym zapytaniu
 		if err != nil {
 			panic(err)
 		}
-		// dobra i teraz to mozna jakos zapisac do jakiegos pliku i napisac zeby ladowalo to do channels.go przy kazdym odpaleniu programu
 		link = channels[text]
-		// dziala jak cos teraz tylko trzeba wykombinowac jak to dodac do mapy w channels.go na stale
 		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
 	}
 
@@ -398,29 +358,10 @@ func (m model) View() string {
 			}
 		}
 
-		/*
-			l := list.New(itemshist, itemDelegate{}, 17, listHeight)
-			l.Title = "Select the channel you'd like to watch"
-			l.SetShowStatusBar(false)
-			l.SetFilteringEnabled(false)
-			l.Styles.Title = titleStyle
-			l.Styles.PaginationStyle = paginationStyle
-			l.Styles.HelpStyle = helpStyle
-
-			m = model{list: l} // tutaj jestem w modelu model i on sam siebie wywoluje
-
-			if _, err := tea.NewProgram(m).Run(); err != nil {
-				fmt.Println("Error running program:", err)
-				os.Exit(1)
-			}
-		*/
-
 		for title, link := range titleLinkMap {
 			fmt.Printf("%s: %s\n", title, link)
 		}
 		link = "https://iv.nboeck.de/channel/UC7YOGHUfC1Tb6E4pudI9STA"
-
-		// to nie bedzie dzialac bo w mainie jest przeciez scrapowanie tego wszystkiego wiec trzeba pewnie zrobic jakis if statement i tam mecze to beda inaczej wyciagane w ogole
 
 		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
 	}
@@ -511,7 +452,6 @@ func (m modelthree) View() string {
 
 		for key, value := range videos {
 			if value == link {
-				//fmt.Printf("The key associated with the value '%s' is '%s'\n", link, key)
 				combinated := fmt.Sprintf("%s - %s\n", key, link)
 				file, err := os.OpenFile("history", os.O_APPEND|os.O_WRONLY, 0644)
 				if err != nil {

@@ -1,6 +1,4 @@
 package main
 var channelstwo = map[string]string{
-    "tt":    "https://iv.nboeck.de/channel/UCydEg4QfAneBcUZ-uST643w",
-    "t2":    "https://iv.nboeck.de/channel/UCydEg4QfAneBcUZ-uST643wtt",
-    "":    "https://iv.nboeck.de/channel/UCydEg4QfAneBcUZ-uST643w    test2",
+    "wilno":    "https://iv.nboeck.de/channel/UCFGgduo8E8jfe6T8HH79iWQ",
 }
