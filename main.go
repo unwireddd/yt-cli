@@ -23,7 +23,12 @@ func removeFirstAlphanumeric(s string) string {
 }
 
 func main() {
-
+	//renamer()
+	convertList()
+	for key, value := range channelstwo {
+		channels[key] = value
+	}
+	fmt.Println(channels)
 	screen.Clear()
 	var m tea.Model
 	var items []list.Item
@@ -40,6 +45,7 @@ func main() {
 
 	items = append(items, item("Search"))
 	items = append(items, item("History"))
+	items = append(items, item("Add / Remove a channel"))
 
 	const defaultWidth = 20
 

@@ -30,6 +30,8 @@ var testowanie string
 var titleLinkMap = make(map[string]string)
 var itemshist []list.Item
 var isHistory bool
+var text2 string
+var toSubs string
 
 // test model4
 
@@ -89,6 +91,61 @@ func (m modelfour) View() string {
 }
 
 // end test modelfour
+
+// test modelfive
+
+type modelfive struct {
+	textInput textinput.Model
+	err       error
+}
+
+func initialModel2() modelfive {
+	ti := textinput.New()
+	ti.Placeholder = "Linux"
+	ti.Focus()
+	ti.CharLimit = 156
+	ti.Width = 20
+
+	return modelfive{
+		textInput: ti,
+		err:       nil,
+	}
+}
+
+func (m modelfive) Init() tea.Cmd {
+	return textinput.Blink
+}
+
+func (m modelfive) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmd tea.Cmd
+
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.Type {
+		case tea.KeyEnter, tea.KeyCtrlC, tea.KeyEsc:
+			return m, tea.Quit
+		}
+
+	// We handle errors just like any other message
+	case errMsg:
+		m.err = msg
+		return m, nil
+	}
+
+	m.textInput, cmd = m.textInput.Update(msg)
+	return m, cmd
+}
+
+func (m modelfive) View() string {
+	text2 = m.textInput.Value()
+	return fmt.Sprintf(
+		"Search:\n\n%s\n\n%s",
+		m.textInput.View(),
+		"(esc to quit)",
+	) + "\n"
+}
+
+// end test modelfive
 
 func restart() {
 	args := os.Args
@@ -252,12 +309,52 @@ func (m model) View() string {
 	var ok bool
 
 	if m.choice == "Add / Remove a channel" {
+		testowanko()
 		p := tea.NewProgram(initialModel())
 		if _, err := p.Run(); err != nil {
 			log.Fatal(err)
 		}
-		channels[text] = "https://iv.nboeck.de/channel/UCxJDH_2HXzwUtT62HgWJqCg"
-		link = channels["testowanko"]
+		p = tea.NewProgram(initialModel2())
+		if _, err := p.Run(); err != nil {
+			log.Fatal(err)
+		}
+		channels[text] = text2
+		// tutaj sie dodaje text w sensie nazwa kanalu i jakis losowy link niezalezny od niczego
+		// mozna w sumie zrobic osobny parser dla kanalow i pokazuje pierwszy znaleziony
+		// albo w sumie chuj w ostatecznosci moge tez pytac o link i w ten sposob dodawac i zapisywac to w tekscie a potem appendowac za kadzym odpaleniem
+		toSubs = fmt.Sprintf("%s	%s ", text, text2)
+		// poki co jest w takim formacie ale to nic mozna potem cos wykombinowac ai zapytac zeby to zmienic na format mapkowy
+		// teraz najwiekszy problem to te jebane zapytania we frameworku co sie wyswietlaja 2 razy z jakiegos powodu
+		// to zapytanie o kanal w ogole chyba 2 razy to zapisuje w pliku jak sie cos faktycznie wpisze 2 razy w zapytaniu
+		file, err := os.OpenFile("channels.md", os.O_APPEND|os.O_WRONLY, 0644)
+		if err != nil {
+			panic(err)
+		}
+		defer file.Close()
+
+		// Write the content to the file
+		_, err = file.WriteString(toSubs)
+		//_, err = file.WriteString("\n")
+
+		//_, err = file.WriteString("\n")
+		// zeby to dobrze dzialalo to trzeba zeby kazdy zestaw link + kanal byl razem w osobnej linii i wtedy bedzie git
+
+		// !!! mozna zmienic format pliku z .txt na .md to wtedy bedzie czytac htmlowy syntax tylko nie wiadomo czy skrypt bedzie to obslugiwal wtedy
+		// i chuj niby dalej jest to w nowej linii nie wiem czemu
+
+		// !!!
+		// moge teoretycznie napisac osobny skrypt do przerabiania pliku .md zeby byl wlasciwy format ale nie wiem czy to dobry pomysl
+		// dobra to dziala i jest normalnie w output.md
+
+		// dalej jest zle ale mozna sie spytac ai zeby mi
+		// text2 to link ktory faktycznie sie gdzies zapisuje dopiero w drugim zapytaniu
+		// text to nazwa ktora zapisuje sie w pierwszym zapytaniu
+		if err != nil {
+			panic(err)
+		}
+		// dobra i teraz to mozna jakos zapisac do jakiegos pliku i napisac zeby ladowalo to do channels.go przy kazdym odpaleniu programu
+		link = channels[text]
+		// dziala jak cos teraz tylko trzeba wykombinowac jak to dodac do mapy w channels.go na stale
 		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
 	}
 
@@ -267,12 +364,6 @@ func (m model) View() string {
 		p := tea.NewProgram(initialModel())
 		if _, err := p.Run(); err != nil {
 			log.Fatal(err)
-		}
-
-		if m.choice == "Add" {
-			cmd := exec.Command("vim", "channels.go")
-			cmd.Run()
-			return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
 		}
 
 		encodedText := url.QueryEscape(text)
