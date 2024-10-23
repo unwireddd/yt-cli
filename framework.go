@@ -122,6 +122,7 @@ func (m modelsix) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Batch(cmds...)
 
 		// Set focus to next input
+
 		case "tab", "shift+tab", "enter", "up", "down":
 			s := msg.String()
 
