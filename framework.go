@@ -13,6 +13,7 @@ import (
 
 	//"os"
 
+	"github.com/charmbracelet/bubbles/cursor"
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -31,6 +32,180 @@ var itemshist []list.Item
 var isHistory bool
 var text2 string
 var toSubs string
+var nazwa string
+var nazwaLink string
+
+// testing podwojne
+
+/*
+	-na to does not implement tea model bylo jakies latwe rozwiazanie bo to robilem juz wczesniej z poprzednimi modelami (pewnie cos w mainie tylko musze to znalezc)
+	-albo porownac z tym drugim szukaniem bo oba nie sa wykonywane w mainie
+*/
+
+var (
+	focusedStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
+	blurredStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
+	cursorStyle         = focusedStyle
+	noStyle             = lipgloss.NewStyle()
+	helpStyle2          = blurredStyle
+	cursorModeHelpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("244"))
+
+	focusedButton = focusedStyle.Render("[ Submit ]")
+	blurredButton = fmt.Sprintf("[ %s ]", blurredStyle.Render("Submit"))
+)
+
+type modelsix struct {
+	focusIndex int
+	inputs     []textinput.Model
+	cursorMode cursor.Mode
+}
+
+// w initialModel sie nie robi problem a w tym na dole juz tak
+// also wiadomo juz ze to nie wina samego kodu w przykladzie bo jak testowalem to dzialalo normalnie
+// nie wina helpStyle ani initialmodel3
+
+/*
+-dziala i to byla literowka jakas
+-teraz ogolnie trzeba przerobic tak zeby to zapisywalo w zmienna i robilo to samo co robia tamte dwa ktore sa osobno
+*/
+
+func initialModel3() modelsix {
+	m := modelsix{
+		inputs: make([]textinput.Model, 3),
+	}
+
+	var t textinput.Model
+	for i := range m.inputs {
+		t = textinput.New()
+		t.Cursor.Style = cursorStyle
+		t.CharLimit = 32
+
+		switch i {
+		case 0:
+			t.Placeholder = "Name"
+			t.Focus()
+			t.PromptStyle = focusedStyle
+			t.TextStyle = focusedStyle
+		case 1:
+			t.Placeholder = "Invidious link"
+			t.CharLimit = 64
+		}
+
+		m.inputs[i] = t
+	}
+
+	return m
+}
+
+func (m modelsix) Init() tea.Cmd {
+	return textinput.Blink
+}
+
+func (m modelsix) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "ctrl+c", "esc":
+			return m, tea.Quit
+
+		// Change cursor mode
+		case "ctrl+r":
+			m.cursorMode++
+			if m.cursorMode > cursor.CursorHide {
+				m.cursorMode = cursor.CursorBlink
+			}
+			cmds := make([]tea.Cmd, len(m.inputs))
+			for i := range m.inputs {
+				cmds[i] = m.inputs[i].Cursor.SetMode(m.cursorMode)
+			}
+			return m, tea.Batch(cmds...)
+
+		// Set focus to next input
+		case "tab", "shift+tab", "enter", "up", "down":
+			s := msg.String()
+
+			// Did the user press enter while the submit button was focused?
+			// If so, exit.
+			if s == "enter" && m.focusIndex == len(m.inputs) {
+				return m, tea.Quit
+			}
+
+			// Cycle indexes
+			if s == "up" || s == "shift+tab" {
+				m.focusIndex--
+			} else {
+				m.focusIndex++
+			}
+
+			if m.focusIndex > len(m.inputs) {
+				m.focusIndex = 0
+			} else if m.focusIndex < 0 {
+				m.focusIndex = len(m.inputs)
+			}
+
+			cmds := make([]tea.Cmd, len(m.inputs))
+			for i := 0; i <= len(m.inputs)-1; i++ {
+				if i == m.focusIndex {
+					// Set focused state
+					cmds[i] = m.inputs[i].Focus()
+					m.inputs[i].PromptStyle = focusedStyle
+					m.inputs[i].TextStyle = focusedStyle
+					continue
+				}
+				// Remove focused state
+				m.inputs[i].Blur()
+				m.inputs[i].PromptStyle = noStyle
+				m.inputs[i].TextStyle = noStyle
+			}
+
+			//fmt.Println(m.inputs[0].Value())
+
+			return m, tea.Batch(cmds...)
+		}
+	}
+
+	// Handle character input and blinking
+	cmd := m.updateInputs(msg)
+
+	return m, cmd
+}
+
+func (m *modelsix) updateInputs(msg tea.Msg) tea.Cmd {
+	cmds := make([]tea.Cmd, len(m.inputs))
+
+	// Only text inputs with Focus() set will respond, so it's safe to simply
+	// update all of them here without any further logic.
+	for i := range m.inputs {
+		m.inputs[i], cmds[i] = m.inputs[i].Update(msg)
+	}
+
+	return tea.Batch(cmds...)
+}
+
+func (m modelsix) View() string {
+	var b strings.Builder
+
+	for i := range m.inputs {
+		b.WriteString(m.inputs[i].View())
+		if i < len(m.inputs)-1 {
+			b.WriteRune('\n')
+		}
+	}
+
+	button := &blurredButton
+	if m.focusIndex == len(m.inputs) {
+		button = &focusedButton
+	}
+	fmt.Fprintf(&b, "\n\n%s\n\n", *button)
+
+	b.WriteString(helpStyle.Render("cursor mode is "))
+	b.WriteString(cursorModeHelpStyle.Render(m.cursorMode.String()))
+	b.WriteString(helpStyle.Render(" (ctrl+r to change style)"))
+	nazwa = m.inputs[0].Value()
+	nazwaLink = m.inputs[1].Value()
+	return b.String()
+}
 
 // test model4
 
@@ -89,6 +264,8 @@ func (m modelfour) View() string {
 	) + "\n"
 }
 
+// START wpisywanie
+
 type modelfive struct {
 	textInput textinput.Model
 	err       error
@@ -96,7 +273,7 @@ type modelfive struct {
 
 func initialModel2() modelfive {
 	ti := textinput.New()
-	ti.Placeholder = "Linux"
+	ti.Placeholder = "[Invidious link]"
 	ti.Focus()
 	ti.CharLimit = 156
 	ti.Width = 20
@@ -131,9 +308,7 @@ func (m modelfive) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m modelfive) View() string {
-	if m.textInput.Value() == "" {
-		return "This pool cannot be empty"
-	}
+	// if empty
 	text2 = m.textInput.Value()
 	return fmt.Sprintf(
 		"Search:\n\n%s\n\n%s",
@@ -290,9 +465,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	var ok bool
 
+	/*
+		-juz za pierwszym dodaniem tego przy szukaniu byl problem ze sie odpala 2 razy
+		-mozna uzyc tego https://github.com/charmbracelet/bubbletea/blob/main/examples/textinputs/main.go
+
+	*/
+
 	if m.choice == "Add / Remove a channel" {
 		testowanko()
-		p := tea.NewProgram(initialModel())
+
+		if _, err := tea.NewProgram(initialModel3()).Run(); err != nil {
+			fmt.Printf("could not start program: %s\n", err)
+			os.Exit(1)
+		}
+
+		/*p := tea.NewProgram(initialModel())
 		if _, err := p.Run(); err != nil {
 			log.Fatal(err)
 		}
@@ -300,8 +487,9 @@ func (m model) View() string {
 		if _, err := p.Run(); err != nil {
 			log.Fatal(err)
 		}
-		channels[text] = text2
-		toSubs = fmt.Sprintf("%s	%s ", text, text2)
+		*/
+		channels[nazwa] = nazwaLink
+		toSubs = fmt.Sprintf("%s	%s ", nazwaLink, nazwa)
 		// for now the biggest problem is that those input models in framework are displayed 2 times Idk why
 		file, err := os.OpenFile("channels.md", os.O_APPEND|os.O_WRONLY, 0644)
 		if err != nil {
@@ -314,7 +502,7 @@ func (m model) View() string {
 		if err != nil {
 			panic(err)
 		}
-		link = channels[text]
+		link = channels[nazwa]
 		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
 	}
 
