@@ -34,6 +34,7 @@ var text2 string
 var toSubs string
 var nazwa string
 var nazwaLink string
+var linkingError string
 
 // testing podwojne
 
@@ -71,7 +72,7 @@ type modelsix struct {
 
 func initialModel3() modelsix {
 	m := modelsix{
-		inputs: make([]textinput.Model, 3),
+		inputs: make([]textinput.Model, 2),
 	}
 
 	var t textinput.Model
@@ -89,6 +90,7 @@ func initialModel3() modelsix {
 		case 1:
 			t.Placeholder = "Invidious link"
 			t.CharLimit = 64
+
 		}
 
 		m.inputs[i] = t
@@ -480,6 +482,11 @@ func (m model) View() string {
 			os.Exit(1)
 		}
 
+		if !strings.HasPrefix(nazwaLink, "https://") {
+			fmt.Println("This doesnt seem to be a valid invidious link")
+			os.Exit(1)
+		}
+
 		/*p := tea.NewProgram(initialModel())
 		if _, err := p.Run(); err != nil {
 			log.Fatal(err)
@@ -489,8 +496,13 @@ func (m model) View() string {
 			log.Fatal(err)
 		}
 		*/
+
 		channels[nazwa] = nazwaLink
-		toSubs = fmt.Sprintf("%s	%s ", nazwaLink, nazwa)
+		// jak nazwa kanalu ma wiecej niz jedno slowo to sie pierdoli ale to mozna jakos naprawic np cudzyslow
+		// also ten skrypt do zamiany mi usuwa duplikaty z channels.md wiec nie trzeba sie tym martwic w ogole
+
+		nazwa = strings.ReplaceAll(nazwa, " ", "_")
+		toSubs = fmt.Sprintf("%s	%s ", nazwa, nazwaLink)
 		// for now the biggest problem is that those input models in framework are displayed 2 times Idk why
 		file, err := os.OpenFile("channels.md", os.O_APPEND|os.O_WRONLY, 0644)
 		if err != nil {
