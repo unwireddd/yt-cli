@@ -16,6 +16,7 @@ import (
 var lista []list.Item
 var itemki []string
 var itemstwo []list.Item
+var updatedMap = make(map[string]string)
 
 func removeFirstAlphanumeric(s string) string {
 	re := regexp.MustCompile(`^[a-zA-Z0-9_\-]+`)
@@ -23,12 +24,18 @@ func removeFirstAlphanumeric(s string) string {
 }
 
 func main() {
+x2:
+	for key, value := range channelstwo {
+		newKey := strings.Replace(key, "_", " ", -1)
+		updatedMap[newKey] = value
+	}
+	fmt.Println(updatedMap)
 	//renamer()
 	convertList()
-	for key, value := range channelstwo {
+	for key, value := range updatedMap {
 		channels[key] = value
 	}
-	fmt.Println(channels)
+	//fmt.Println(channels)
 	screen.Clear()
 	var m tea.Model
 	var items []list.Item
@@ -45,7 +52,7 @@ func main() {
 
 	items = append(items, item("Search"))
 	items = append(items, item("History"))
-	items = append(items, item("Add / Remove a channel"))
+	items = append(items, item("Add a channel"))
 
 	const defaultWidth = 20
 
@@ -98,7 +105,13 @@ func main() {
 		}
 	} else {
 		// notatka ze przeciez mam jeszcze ta mape co przy robieniu history sie zrobila
+		// dobra tu mam mapke filmikow wiec pewnie trzeba zrobic zeby liczylo ile ma elementow i na tej podstawie dostosowac dlugosc w opisie frameworka
+		// also ciekawe bo jak dam na poczatku jakis kanal a potem historie to sie wyswietla normalnie historia tylko potem wszystko inne to tez historia
+		// !!! dobra teraz jak tak patrze na te historie to to w ogole nie jest to co powinno byc w sensie output.txt bo nie ma niektorych filmikow
+		// a nie jednak jest tylko w jakis dziwny sposob to dziala bo np jeden filmik pokazuje sie dopiero na 10 stronie
 		videos = titleLinkMap
+		fmt.Println(len(videos))
+		listHeight = len(videos)
 	}
 
 	for i, str := range mecze {
@@ -108,6 +121,7 @@ func main() {
 	}
 
 	for i := range mecze {
+		// z tym bledem na dole to cos tutaj w sumie moze byc albo w sumie nie bo to goto drugim w mainie i tak mnie cofa do poczatku wiec moze trzeba jakos zrobic zeby przywracalo wartosci framework.go do tych co byly na poczatku
 		itemstwo = append(itemstwo, item(mecze[i]))
 		itemki = append(itemki, mecze[i])
 	}
@@ -142,8 +156,18 @@ x:
 			fmt.Println("Error running program:", err)
 			os.Exit(1)
 		}
+
 	}
 
+	if isgb {
+		// tutaj wyswietla filmiki tego kanalu co sie wybralo na poczatku nie wiem do konca czemu
+
+		//z link = "" i redeklarowaniem modelu jest dalej to samo
+		// jak cos to to nie jest problem z wartoscia linku tylko z lista prawdopodobnie
+		// also w ogole teraz jak to naprawilem to play next video ekran sie nie odpala tylko wraca do wyboru filmiku a jak za pierwszym razem odpalam bez cofania to normalnie jest
+		link = ""
+		goto x2
+	}
 	l = list.New(itemsthree, itemDelegate{}, defaultWidth, listHeight)
 	l.Title = "Select option"
 	l.SetShowStatusBar(false)

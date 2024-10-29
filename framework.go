@@ -35,6 +35,8 @@ var toSubs string
 var nazwa string
 var nazwaLink string
 var linkingError string
+var isgb bool
+var lenHistory int
 
 // testing podwojne
 
@@ -320,7 +322,11 @@ func (m modelfive) View() string {
 	) + "\n"
 }
 
-const listHeight = 30
+// !!! dobra tutaj jest jednak wysokosc listy
+
+var listHeight = 30
+
+// jak to ustawie na 15 to w listach dalej jest 30 nie wiem czemu
 
 var (
 	titleStyle        = lipgloss.NewStyle().MarginLeft(2)
@@ -371,14 +377,19 @@ func (m modeltwo) Init() tea.Cmd {
 func (m modeltwo) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
+		// na dole jest ustawianie ile elementow jest na liscie chyba
+		// we wszystkich przypadkach jest max 30 elementow a tu jest 100 bo w innych jest 30 filmikow a tu ciagnie z mojej listy z history
 		m.list.SetWidth(msg.Width)
 		return m, nil
 
 	case tea.KeyMsg:
+
 		switch keypress := msg.String(); keypress {
 		case "q", "ctrl+c":
-			m.quitting = true
-			return m, tea.Quit
+			// to jest do listy filmikow jak cos chyba ze to w ogole nie jest z modeltwo tylko z tym pierwszym
+			isgb = true
+			//m.quitting = true
+			//return m, tea.Quit
 
 		case "enter":
 			i, ok := m.list.SelectedItem().(item)
@@ -449,6 +460,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch keypress := msg.String(); keypress {
 		case "q", "ctrl+c":
 			m.quitting = true
+			//os.Exit(0)
+			// teraz teoretycznie sie nie wraca tylko normalnie wychodzi ale jest ten blad z wywalaniem sie terminala
+			// dobra nvm to jednak nie jest problem chyba
 			return m, tea.Quit
 
 		case "enter":
@@ -498,7 +512,7 @@ func (m model) View() string {
 		*/
 
 		channels[nazwa] = nazwaLink
-		// jak nazwa kanalu ma wiecej niz jedno slowo to sie pierdoli ale to mozna jakos naprawic np cudzyslow
+		// jak nazwa kanalu ma wiecej niz jedno slowo to sie psuje ale to mozna jakos naprawic np cudzyslow
 		// also ten skrypt do zamiany mi usuwa duplikaty z channels.md wiec nie trzeba sie tym martwic w ogole
 
 		nazwa = strings.ReplaceAll(nazwa, " ", "_")
@@ -536,8 +550,9 @@ func (m model) View() string {
 	if m.choice == "History" {
 		rmDuplicates()
 		isHistory = true
-
-		file, _ := os.Open("output.txt")
+		// output.txt to history z usunietymi duplikatami jak cos
+		// jak tu dam history to jest w ogole to samo
+		file, _ := os.Open("history")
 		defer file.Close()
 
 		scanner := bufio.NewScanner(file)
@@ -549,7 +564,9 @@ func (m model) View() string {
 				//fmt.Printf("Skipping invalid line: %s\n", line)
 				continue
 			}
-
+			// tutaj mozna w sumie cos pokombinowac z tym zmienianiem dlugosci listy zamiast w mainie bo to framework i tu deklaruje modele wiec jednak latwiej
+			// notatka ze to jest model pierwszy wiec mozna cos normalnie zapisac w variabla i zamienic w modeltwo a modeltwo jest na gorze
+			// albo w sumie mozna cos poprobowac z
 			title := parts[0]
 			link := parts[1]
 
@@ -558,6 +575,7 @@ func (m model) View() string {
 				itemshist = append(itemshist, item(t))
 			}
 		}
+		lenHistory = len(titleLinkMap)
 
 		for title, link := range titleLinkMap {
 			fmt.Printf("%s: %s\n", title, link)
