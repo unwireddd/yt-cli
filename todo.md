@@ -7,3 +7,4 @@ to jest niby rozwiazane ale potem jak sie wroce to przez goto statement sie cos 
 -w niektorych przypadkach caly teminal sie wywala nie wiadomo czemu
 -z history mozna usunac te duplikaty jakos podejrzewam ze mozna zrobic cos typu dynamiczne zmienianie length w funkcji w zaleznosci od tego ile jest elementow tam
 -naprawic ze mpv sie odpala 2 razy i te gowna z wpisywaniem przy add
+-naprawic wyswietlanie playlist w szukaniu

@@ -97,8 +97,9 @@ x2:
 			match = strings.Replace(match, "?list=", "[Playlist]", 1)
 			match = removeFirstAlphanumeric(match)
 			match = strings.TrimSpace(match)
-
+			//fmt.Println(match)
 			mecze = append(mecze, match)
+			// mecze to jest lista tytulow jak cos
 
 			videos[match] = link
 			video = video + 1
@@ -109,9 +110,13 @@ x2:
 		// also ciekawe bo jak dam na poczatku jakis kanal a potem historie to sie wyswietla normalnie historia tylko potem wszystko inne to tez historia
 		// !!! dobra teraz jak tak patrze na te historie to to w ogole nie jest to co powinno byc w sensie output.txt bo nie ma niektorych filmikow
 		// a nie jednak jest tylko w jakis dziwny sposob to dziala bo np jeden filmik pokazuje sie dopiero na 10 stronie
+		// ok czyli samo titleLinkMap jest w porzadku tylko to sie laduje jakos w nieskonczonosc chyba bo jest do 312
+		fmt.Println(itemshist)
+		// !!! dobra czyli generalnie to jest problem z tym ze itemshist sie zapetla w ktoryms momencie chyba
 		videos = titleLinkMap
-		fmt.Println(len(videos))
-		listHeight = len(videos)
+
+		fmt.Println(len(itemshist))
+		//listHeight = len(videos)
 	}
 
 	for i, str := range mecze {
@@ -125,6 +130,7 @@ x2:
 		itemstwo = append(itemstwo, item(mecze[i]))
 		itemki = append(itemki, mecze[i])
 	}
+	// ! tutaj moge cos pokombinowac zeby w history bylo rozwiazane jakos identycznie
 x:
 	if isHistory {
 		l = list.New(itemshist, itemDelegate{}, defaultWidth, listHeight)
@@ -158,6 +164,10 @@ x:
 		}
 
 	}
+	// sprobuje jutro wyklikac ze wiecej filmikow bo moze one dlatego sie zapetlaja
+	/*
+		dobra czyli ogolnie kolejnosc jest zalatwiona tylko teraz trzeba ogarnac to zapetlanie i cala funkcja historii bedzie zrobiona
+	*/
 
 	if isgb {
 		// tutaj wyswietla filmiki tego kanalu co sie wybralo na poczatku nie wiem do konca czemu

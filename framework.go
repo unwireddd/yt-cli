@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"maps"
 	"net/url"
 	"os"
 	"os/exec"
@@ -324,7 +323,7 @@ func (m modelfive) View() string {
 
 // !!! dobra tutaj jest jednak wysokosc listy
 
-var listHeight = 30
+const listHeight = 30
 
 // jak to ustawie na 15 to w listach dalej jest 30 nie wiem czemu
 
@@ -412,6 +411,7 @@ func (m modeltwo) View() string {
 
 	link, ok = videos[m.choice]
 
+	// to jest do zapisywania historii
 	for key, value := range videos {
 		if value == link {
 			//fmt.Printf("The key associated with the value '%s' is '%s'\n", link, key)
@@ -552,7 +552,7 @@ func (m model) View() string {
 		isHistory = true
 		// output.txt to history z usunietymi duplikatami jak cos
 		// jak tu dam history to jest w ogole to samo
-		file, _ := os.Open("history")
+		file, _ := os.Open("output.txt")
 		defer file.Close()
 
 		scanner := bufio.NewScanner(file)
@@ -571,19 +571,51 @@ func (m model) View() string {
 			link := parts[1]
 
 			titleLinkMap[title] = link
-			for t := range maps.Keys(titleLinkMap) {
-				itemshist = append(itemshist, item(t))
-			}
+
+			itemshist = append(itemshist, item(parts[0]))
+
+			// aa czyli moge teraz sobie tez tutaj zrobic taka liste tytulow i potem ja jakos matchowac z ta mapka i wtedy powinno byc po kolei
+			// dobra czyli teraz jest git tylko sie wyswietla na odwrot wiec pewnie trzeba odwrocic tablice
+
+			//itemshist = append(itemshist, item(titleLinkMap[title]))
+			// jak tutaj se printuje titleLinkMap to sie pokazuje kilka razy wiec mozliwe ze to sie zapetla jakos
+			//fmt.Println(len(titleLinkMap))
+			// test petla
+			// tutaj jak probuje zeby dodal tylko pierwsze 30 to dalej sie wypierdala
+
 		}
+		histlen := len(itemshist) / 2
+		itemshist = itemshist[:histlen]
+
+		// normalny len itemshist to 32 a jak tutaj zrobie dzielenie przez 2 to nagle len jest 12
+
+		for i, j := 0, len(itemshist)-1; i < j; i, j = i+1, j-1 {
+			itemshist[i], itemshist[j] = itemshist[j], itemshist[i]
+		}
+
+		// jak podziele przez 2 to w ogole sie wyswietla tylko peirwsze 11 zamiast 15 z jakiegos powodu also to chyba nie jest problem z dlugoscia tablicy tylko z tym jak on to laduje potem
+		// nawet jak dlugosc tablicy to jest 16 to i tak wyswietla 18
+		// i nie wiedziec czemu w history sie tez jakos losowo wyswietla kanal
+
+		// i chyba w ogole zapetla sie dokladnie 2 razy
+		// teraz chyba jest git tylko trzeba jeszcze jakos wykombinowac zeby sie przestalo zapetlac
+
+		/*for t := range maps.Keys(titleLinkMap) {
+			itemshist = append(itemshist, item(t))
+		} */
+
 		lenHistory = len(titleLinkMap)
 
-		for title, link := range titleLinkMap {
+		/*for title, link := range titleLinkMap {
 			fmt.Printf("%s: %s\n", title, link)
-		}
+		} */
+
 		link = "https://iv.nboeck.de/channel/UC7YOGHUfC1Tb6E4pudI9STA"
 
 		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
 	}
+
+	// wyglada na to ze z tym kodem jest wszystko git tylko cos sie psuje w tym wyswietlaniu go
 
 	link, ok = channels[m.choice]
 	if ok {
