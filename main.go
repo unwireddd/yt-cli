@@ -95,6 +95,9 @@ x2:
 			match = strings.Replace(match, `https://www.youtube.com/`, fmt.Sprintf(""), -1)
 			match = strings.Replace(match, "watch?v=", "", 1)
 			match = strings.Replace(match, "?list=", "[Playlist]", 1)
+			//match = strings.Replace(match, "-", "/", 1)
+			// dobra jak to robie to cos sie dziwnego dzieje z tytulami z jakiegos powodu
+			// aaa moge chyba zwyczajnie w tym drugim zamienic myslniki na jakis inny znak i bedzie git
 			match = removeFirstAlphanumeric(match)
 			match = strings.TrimSpace(match)
 			//fmt.Println(match)
@@ -117,6 +120,7 @@ x2:
 
 		fmt.Println(len(itemshist))
 		//listHeight = len(videos)
+		// a moze trzeba czesc tego kodu w ogole przeniesc do maina zamiast trzymac we frameworku
 	}
 
 	for i, str := range mecze {
@@ -128,6 +132,8 @@ x2:
 	for i := range mecze {
 		// z tym bledem na dole to cos tutaj w sumie moze byc albo w sumie nie bo to goto drugim w mainie i tak mnie cofa do poczatku wiec moze trzeba jakos zrobic zeby przywracalo wartosci framework.go do tych co byly na poczatku
 		itemstwo = append(itemstwo, item(mecze[i]))
+		// tylko mecze to jest w ogole ta tablica wiec w teorii ten kod jest w ogole niepotrzebny
+		// itemki jest uzywane 3 razy i potem nic sie z tym nie dzieje
 		itemki = append(itemki, mecze[i])
 	}
 	// ! tutaj moge cos pokombinowac zeby w history bylo rozwiazane jakos identycznie

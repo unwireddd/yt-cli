@@ -27,6 +27,7 @@ var videos map[string]string = make(map[string]string)
 var globaltest string
 var testowanie string
 var titleLinkMap = make(map[string]string)
+var itemkihist []string
 var itemshist []list.Item
 var isHistory bool
 var text2 string
@@ -36,6 +37,7 @@ var nazwaLink string
 var linkingError string
 var isgb bool
 var lenHistory int
+var linecounter int
 
 // testing podwojne
 
@@ -415,7 +417,7 @@ func (m modeltwo) View() string {
 	for key, value := range videos {
 		if value == link {
 			//fmt.Printf("The key associated with the value '%s' is '%s'\n", link, key)
-			combinated := fmt.Sprintf("%s - %s\n", key, link)
+			combinated := fmt.Sprintf("%s [Line break here] %s\n", key, link)
 			file, err := os.OpenFile(filePath, os.O_APPEND|os.O_WRONLY, 0644)
 			if err != nil {
 				panic(err)
@@ -559,7 +561,9 @@ func (m model) View() string {
 
 		for scanner.Scan() {
 			line := scanner.Text()
-			parts := strings.SplitN(line, " - ", 2)
+			parts := strings.SplitN(line, " [Line break here] ", 2)
+			// problem z elementami i iloscia jest chyba rozwiazany tylko teraz sie to znowu powtarza czy cos (wyglada na to ze on teraz ciagnie filmiki z historii)
+			// to jest troche slabe bo w takim przypadku musialbym znalezc jakis znak ktory jest w ogole nie uzywany albo bardzo rzadko uzywany albo jakis kod czy cos
 			if len(parts) != 2 {
 				//fmt.Printf("Skipping invalid line: %s\n", line)
 				continue
@@ -572,7 +576,8 @@ func (m model) View() string {
 
 			titleLinkMap[title] = link
 
-			itemshist = append(itemshist, item(parts[0]))
+			itemkihist = append(itemkihist, parts[0])
+			// tutaj sie za kazdym razem niby appenduje i to sa tytuly tylko trzeba porownac z modeltwo jak to sie przypisuje do linkow z tablicy
 
 			// aa czyli moge teraz sobie tez tutaj zrobic taka liste tytulow i potem ja jakos matchowac z ta mapka i wtedy powinno byc po kolei
 			// dobra czyli teraz jest git tylko sie wyswietla na odwrot wiec pewnie trzeba odwrocic tablice
@@ -581,17 +586,56 @@ func (m model) View() string {
 			// jak tutaj se printuje titleLinkMap to sie pokazuje kilka razy wiec mozliwe ze to sie zapetla jakos
 			//fmt.Println(len(titleLinkMap))
 			// test petla
-			// tutaj jak probuje zeby dodal tylko pierwsze 30 to dalej sie wypierdala
+			// tutaj jak probuje zeby dodal tylko pierwsze 30 to dalej sie wywala
 
 		}
-		histlen := len(itemshist) / 2
-		itemshist = itemshist[:histlen]
+
+		for i, j := 0, len(itemkihist)-1; i < j; i, j = i+1, j-1 {
+			itemkihist[i], itemkihist[j] = itemkihist[j], itemkihist[i]
+		}
+
+		// dobra wiem bo mecze to jest zwykla tablica bez item() i w mainie to to w ten sposob zamienia
+		// mozna sprobowac tu w sumie pewnie nic nie da
+		for i := range itemkihist {
+			// z tym bledem na dole to cos tutaj w sumie moze byc albo w sumie nie bo to goto drugim w mainie i tak mnie cofa do poczatku wiec moze trzeba jakos zrobic zeby przywracalo wartosci framework.go do tych co byly na poczatku
+			itemshist = append(itemshist, item(itemkihist[i]))
+			// tylko mecze to jest w ogole ta tablica wiec w teorii ten kod jest w ogole niepotrzebny
+			// itemki jest uzywane 3 razy i potem nic sie z tym nie dzieje
+			itemki = append(itemki, itemkihist[i])
+		}
+
+		countLines()
+
+		// dobra czyli generalnie ten problem z tym ze raz filmik sie pokazuje a raz nie wynika z tego ze w niektorych tytulach sa myslniki i to psuje
+		// prawdopodonie przez to tez sie dzieje to z tymi elementami w tablicy
+
+		itemkihist = itemkihist[:linecounter]
+
+		// to w teorii dziala ale jest ogolnie slabym rozwiazaniem bo nie wiem w ogole czemu i ile on tych filmikow ucina wiec bedzie pol dzialac pol nie
+
+		// [C] aha czyli teraz te filmiki sie w ogole nie chca odpalac
+		// w ostatecznosci mozna zawsze zrobic nowy model tylko dla historii
+		//histlen := len(itemshist) / 2
+		//itemshist = itemshist[:histlen]
 
 		// normalny len itemshist to 32 a jak tutaj zrobie dzielenie przez 2 to nagle len jest 12
 
-		for i, j := 0, len(itemshist)-1; i < j; i, j = i+1, j-1 {
-			itemshist[i], itemshist[j] = itemshist[j], itemshist[i]
-		}
+		// test czy odwracanie psuje to ze filmiki sie nie wyswietlaja (tak) wyswietlaja sie od ostatniego czyli podejrzewam ze jedyny sposob zeby to naprawic to zamiana ich kolejnosci w pliku (jutro)
+		// a nie jednak dziala
+		// czyli jedyny problem to to ucinanie z historia
+
+		//
+		//
+		// teraz jak odpalilem to sie w ogole zapetla kilka razy ale mozna zrobic cos takiego ze liczy mi ile jest elementow w pliku i na tej podstawie ucina
+		// to normalnie dziala tylko przed wyswietleniem sie pokazujje jakis error Idk czemu
+		// nie teraz to w ogole jakos losowo jeden filmik sie odpala drugi nie
+		// ale widze ze to nie jest tego wina tylko czegos co zrobilem poprzednio
+		//
+		//
+
+		//for i, j := 0, len(itemshist)-1; i < j; i, j = i+1, j-1 {
+		//	itemshist[i], itemshist[j] = itemshist[j], itemshist[i]
+		//}
 
 		// jak podziele przez 2 to w ogole sie wyswietla tylko peirwsze 11 zamiast 15 z jakiegos powodu also to chyba nie jest problem z dlugoscia tablicy tylko z tym jak on to laduje potem
 		// nawet jak dlugosc tablicy to jest 16 to i tak wyswietla 18
@@ -670,7 +714,7 @@ func (m modelthree) View() string {
 
 		for key, value := range videos {
 			if value == link {
-				combinated := fmt.Sprintf("%s - %s\n", key, link)
+				combinated := fmt.Sprintf("%s [Line break here] %s\n", key, link)
 				file, err := os.OpenFile("history", os.O_APPEND|os.O_WRONLY, 0644)
 				if err != nil {
 					panic(err)
@@ -703,7 +747,7 @@ func (m modelthree) View() string {
 
 		for key, value := range videos {
 			if value == link {
-				combinated := fmt.Sprintf("%s - %s\n", key, link)
+				combinated := fmt.Sprintf("%s [Line break here] %s\n", key, link)
 				file, err := os.OpenFile("history", os.O_APPEND|os.O_WRONLY, 0644)
 				if err != nil {
 					panic(err)

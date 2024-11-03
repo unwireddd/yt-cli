@@ -1,17 +1,2 @@
-
-Rockstar Hates Linux, Manjaro Goes Immutable, Nextcloud 9 - TLC Does the News - https://www.youtube.com/watch?v=czpho5sEhDU
-Dlaczego Zrobili Teatr Dla Polaków? Udawany Spór Polska Ukraina Ma Niecny Cel! Analiza Ator - https://www.youtube.com/watch?v=BLNtlXgZ6O4
-Konferencja Prezydentów Polski i Szwajcarii - https://www.youtube.com/watch?v=PJT5xTvLrWY
-Briefing po posiedzeniu Rady ds. Bezpieczeństwa i Obronności - https://www.youtube.com/watch?v=06_ccdaHKT4
-Muzeum Kolejnictwa w Jaworzynie Śląskiej - https://www.youtube.com/watch?v=IjKhrQEQt0w
-Living in the Terminal - https://www.youtube.com/watch?v=vQQR01HSGfE
-Przegląd pociągu metra na STP Kabaty - https://www.youtube.com/watch?v=B2JgIq8fk4Q
-Revisiting Brave Browser - Is it Better? - https://www.youtube.com/watch?v=wPGZXPvlAA4
-Why I&#39;ve Returned to Xorg - https://www.youtube.com/watch?v=79EYMHhdyso
-How Do You Take Notes on Linux? - https://www.youtube.com/watch?v=c02nLB76tmQ
-Microsoft Makes Windows Worse With AI - https://www.youtube.com/watch?v=snZ9w5xc_ic
-Montaż tarcz TBM - budowa stacji Karolin - https://www.youtube.com/watch?v=pp1kvugEQNU
-This Linux Question Has No Answer - 2024 Edition - https://www.youtube.com/watch?v=GE1oXtKidfw
-Linux Removes Russian Maintainers - https://www.youtube.com/watch?v=-aeFekbm3Nc
-Metro Warszawskie - poznajcie nas bliżej - https://www.youtube.com/watch?v=bDWNcPVVE98
-Is Cosmic Desktop Really Needed? - https://www.youtube.com/watch?v=S1SHTqaUh-M
+This Linux Question Has No Answer - 2024 Edition [Line break here] https://www.youtube.com/watch?v=GE1oXtKidfw
+How Do You Take Notes on Linux? [Line break here] https://www.youtube.com/watch?v=c02nLB76tmQ

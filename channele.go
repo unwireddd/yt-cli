@@ -1,3 +1,5 @@
+// to jest skrypt do zamieniania na mape w go i jest do czegos innego w ogole
+
 package main
 
 import (

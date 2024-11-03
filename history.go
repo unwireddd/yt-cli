@@ -1,3 +1,5 @@
+// to jest skrypt do zamianiania history w output.txt i wywalanie duplikatow
+
 package main
 
 import (
