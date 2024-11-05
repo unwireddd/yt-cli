@@ -39,13 +39,6 @@ var isgb bool
 var lenHistory int
 var linecounter int
 
-// testing podwojne
-
-/*
-	-na to does not implement tea model bylo jakies latwe rozwiazanie bo to robilem juz wczesniej z poprzednimi modelami (pewnie cos w mainie tylko musze to znalezc)
-	-albo porownac z tym drugim szukaniem bo oba nie sa wykonywane w mainie
-*/
-
 var (
 	focusedStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
 	blurredStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
@@ -63,15 +56,6 @@ type modelsix struct {
 	inputs     []textinput.Model
 	cursorMode cursor.Mode
 }
-
-// w initialModel sie nie robi problem a w tym na dole juz tak
-// also wiadomo juz ze to nie wina samego kodu w przykladzie bo jak testowalem to dzialalo normalnie
-// nie wina helpStyle ani initialmodel3
-
-/*
--dziala i to byla literowka jakas
--teraz ogolnie trzeba przerobic tak zeby to zapisywalo w zmienna i robilo to samo co robia tamte dwa ktore sa osobno
-*/
 
 func initialModel3() modelsix {
 	m := modelsix{
@@ -114,7 +98,6 @@ func (m modelsix) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c", "esc":
 			return m, tea.Quit
 
-		// Change cursor mode
 		case "ctrl+r":
 			m.cursorMode++
 			if m.cursorMode > cursor.CursorHide {
@@ -126,18 +109,13 @@ func (m modelsix) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			return m, tea.Batch(cmds...)
 
-		// Set focus to next input
-
 		case "tab", "shift+tab", "enter", "up", "down":
 			s := msg.String()
 
-			// Did the user press enter while the submit button was focused?
-			// If so, exit.
 			if s == "enter" && m.focusIndex == len(m.inputs) {
 				return m, tea.Quit
 			}
 
-			// Cycle indexes
 			if s == "up" || s == "shift+tab" {
 				m.focusIndex--
 			} else {
@@ -153,25 +131,20 @@ func (m modelsix) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			cmds := make([]tea.Cmd, len(m.inputs))
 			for i := 0; i <= len(m.inputs)-1; i++ {
 				if i == m.focusIndex {
-					// Set focused state
 					cmds[i] = m.inputs[i].Focus()
 					m.inputs[i].PromptStyle = focusedStyle
 					m.inputs[i].TextStyle = focusedStyle
 					continue
 				}
-				// Remove focused state
 				m.inputs[i].Blur()
 				m.inputs[i].PromptStyle = noStyle
 				m.inputs[i].TextStyle = noStyle
 			}
 
-			//fmt.Println(m.inputs[0].Value())
-
 			return m, tea.Batch(cmds...)
 		}
 	}
 
-	// Handle character input and blinking
 	cmd := m.updateInputs(msg)
 
 	return m, cmd
@@ -180,8 +153,6 @@ func (m modelsix) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *modelsix) updateInputs(msg tea.Msg) tea.Cmd {
 	cmds := make([]tea.Cmd, len(m.inputs))
 
-	// Only text inputs with Focus() set will respond, so it's safe to simply
-	// update all of them here without any further logic.
 	for i := range m.inputs {
 		m.inputs[i], cmds[i] = m.inputs[i].Update(msg)
 	}
@@ -212,8 +183,6 @@ func (m modelsix) View() string {
 	nazwaLink = m.inputs[1].Value()
 	return b.String()
 }
-
-// test model4
 
 type (
 	errMsg error
@@ -251,7 +220,6 @@ func (m modelfour) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 
-	// We handle errors just like any other message
 	case errMsg:
 		m.err = msg
 		return m, nil
@@ -269,8 +237,6 @@ func (m modelfour) View() string {
 		"(esc to quit)",
 	) + "\n"
 }
-
-// START wpisywanie
 
 type modelfive struct {
 	textInput textinput.Model
@@ -314,7 +280,7 @@ func (m modelfive) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m modelfive) View() string {
-	// if empty
+
 	text2 = m.textInput.Value()
 	return fmt.Sprintf(
 		"Search:\n\n%s\n\n%s",
@@ -323,11 +289,7 @@ func (m modelfive) View() string {
 	) + "\n"
 }
 
-// !!! dobra tutaj jest jednak wysokosc listy
-
 const listHeight = 30
-
-// jak to ustawie na 15 to w listach dalej jest 30 nie wiem czemu
 
 var (
 	titleStyle        = lipgloss.NewStyle().MarginLeft(2)
@@ -378,8 +340,6 @@ func (m modeltwo) Init() tea.Cmd {
 func (m modeltwo) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		// na dole jest ustawianie ile elementow jest na liscie chyba
-		// we wszystkich przypadkach jest max 30 elementow a tu jest 100 bo w innych jest 30 filmikow a tu ciagnie z mojej listy z history
 		m.list.SetWidth(msg.Width)
 		return m, nil
 
@@ -387,10 +347,7 @@ func (m modeltwo) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		switch keypress := msg.String(); keypress {
 		case "q", "ctrl+c":
-			// to jest do listy filmikow jak cos chyba ze to w ogole nie jest z modeltwo tylko z tym pierwszym
 			isgb = true
-			//m.quitting = true
-			//return m, tea.Quit
 
 		case "enter":
 			i, ok := m.list.SelectedItem().(item)
@@ -416,7 +373,6 @@ func (m modeltwo) View() string {
 	// to jest do zapisywania historii
 	for key, value := range videos {
 		if value == link {
-			//fmt.Printf("The key associated with the value '%s' is '%s'\n", link, key)
 			combinated := fmt.Sprintf("%s [Line break here] %s\n", key, link)
 			file, err := os.OpenFile(filePath, os.O_APPEND|os.O_WRONLY, 0644)
 			if err != nil {
@@ -462,9 +418,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch keypress := msg.String(); keypress {
 		case "q", "ctrl+c":
 			m.quitting = true
-			//os.Exit(0)
-			// teraz teoretycznie sie nie wraca tylko normalnie wychodzi ale jest ten blad z wywalaniem sie terminala
-			// dobra nvm to jednak nie jest problem chyba
 			return m, tea.Quit
 
 		case "enter":
@@ -484,12 +437,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	var ok bool
 
-	/*
-		-juz za pierwszym dodaniem tego przy szukaniu byl problem ze sie odpala 2 razy
-		-mozna uzyc tego https://github.com/charmbracelet/bubbletea/blob/main/examples/textinputs/main.go
-
-	*/
-
 	if m.choice == "Add / Remove a channel" {
 		testowanko()
 
@@ -503,19 +450,7 @@ func (m model) View() string {
 			os.Exit(1)
 		}
 
-		/*p := tea.NewProgram(initialModel())
-		if _, err := p.Run(); err != nil {
-			log.Fatal(err)
-		}
-		p = tea.NewProgram(initialModel2())
-		if _, err := p.Run(); err != nil {
-			log.Fatal(err)
-		}
-		*/
-
 		channels[nazwa] = nazwaLink
-		// jak nazwa kanalu ma wiecej niz jedno slowo to sie psuje ale to mozna jakos naprawic np cudzyslow
-		// also ten skrypt do zamiany mi usuwa duplikaty z channels.md wiec nie trzeba sie tym martwic w ogole
 
 		nazwa = strings.ReplaceAll(nazwa, " ", "_")
 		toSubs = fmt.Sprintf("%s	%s ", nazwa, nazwaLink)
@@ -553,7 +488,6 @@ func (m model) View() string {
 		rmDuplicates()
 		isHistory = true
 		// output.txt to history z usunietymi duplikatami jak cos
-		// jak tu dam history to jest w ogole to samo
 		file, _ := os.Open("output.txt")
 		defer file.Close()
 
@@ -562,31 +496,17 @@ func (m model) View() string {
 		for scanner.Scan() {
 			line := scanner.Text()
 			parts := strings.SplitN(line, " [Line break here] ", 2)
-			// problem z elementami i iloscia jest chyba rozwiazany tylko teraz sie to znowu powtarza czy cos (wyglada na to ze on teraz ciagnie filmiki z historii)
-			// to jest troche slabe bo w takim przypadku musialbym znalezc jakis znak ktory jest w ogole nie uzywany albo bardzo rzadko uzywany albo jakis kod czy cos
 			if len(parts) != 2 {
-				//fmt.Printf("Skipping invalid line: %s\n", line)
+
 				continue
 			}
-			// tutaj mozna w sumie cos pokombinowac z tym zmienianiem dlugosci listy zamiast w mainie bo to framework i tu deklaruje modele wiec jednak latwiej
-			// notatka ze to jest model pierwszy wiec mozna cos normalnie zapisac w variabla i zamienic w modeltwo a modeltwo jest na gorze
-			// albo w sumie mozna cos poprobowac z
+
 			title := parts[0]
 			link := parts[1]
 
 			titleLinkMap[title] = link
 
 			itemkihist = append(itemkihist, parts[0])
-			// tutaj sie za kazdym razem niby appenduje i to sa tytuly tylko trzeba porownac z modeltwo jak to sie przypisuje do linkow z tablicy
-
-			// aa czyli moge teraz sobie tez tutaj zrobic taka liste tytulow i potem ja jakos matchowac z ta mapka i wtedy powinno byc po kolei
-			// dobra czyli teraz jest git tylko sie wyswietla na odwrot wiec pewnie trzeba odwrocic tablice
-
-			//itemshist = append(itemshist, item(titleLinkMap[title]))
-			// jak tutaj se printuje titleLinkMap to sie pokazuje kilka razy wiec mozliwe ze to sie zapetla jakos
-			//fmt.Println(len(titleLinkMap))
-			// test petla
-			// tutaj jak probuje zeby dodal tylko pierwsze 30 to dalej sie wywala
 
 		}
 
@@ -594,72 +514,23 @@ func (m model) View() string {
 			itemkihist[i], itemkihist[j] = itemkihist[j], itemkihist[i]
 		}
 
-		// dobra wiem bo mecze to jest zwykla tablica bez item() i w mainie to to w ten sposob zamienia
-		// mozna sprobowac tu w sumie pewnie nic nie da
+		countLines()
+		fmt.Println(linecounter)
+		itemkihist = itemkihist[:linecounter]
+
 		for i := range itemkihist {
 			// z tym bledem na dole to cos tutaj w sumie moze byc albo w sumie nie bo to goto drugim w mainie i tak mnie cofa do poczatku wiec moze trzeba jakos zrobic zeby przywracalo wartosci framework.go do tych co byly na poczatku
 			itemshist = append(itemshist, item(itemkihist[i]))
-			// tylko mecze to jest w ogole ta tablica wiec w teorii ten kod jest w ogole niepotrzebny
-			// itemki jest uzywane 3 razy i potem nic sie z tym nie dzieje
 			itemki = append(itemki, itemkihist[i])
 		}
-
-		countLines()
-
-		// dobra czyli generalnie ten problem z tym ze raz filmik sie pokazuje a raz nie wynika z tego ze w niektorych tytulach sa myslniki i to psuje
-		// prawdopodonie przez to tez sie dzieje to z tymi elementami w tablicy
-
-		itemkihist = itemkihist[:linecounter]
-
-		// to w teorii dziala ale jest ogolnie slabym rozwiazaniem bo nie wiem w ogole czemu i ile on tych filmikow ucina wiec bedzie pol dzialac pol nie
-
-		// [C] aha czyli teraz te filmiki sie w ogole nie chca odpalac
-		// w ostatecznosci mozna zawsze zrobic nowy model tylko dla historii
-		//histlen := len(itemshist) / 2
-		//itemshist = itemshist[:histlen]
-
-		// normalny len itemshist to 32 a jak tutaj zrobie dzielenie przez 2 to nagle len jest 12
-
-		// test czy odwracanie psuje to ze filmiki sie nie wyswietlaja (tak) wyswietlaja sie od ostatniego czyli podejrzewam ze jedyny sposob zeby to naprawic to zamiana ich kolejnosci w pliku (jutro)
-		// a nie jednak dziala
-		// czyli jedyny problem to to ucinanie z historia
-
-		//
-		//
-		// teraz jak odpalilem to sie w ogole zapetla kilka razy ale mozna zrobic cos takiego ze liczy mi ile jest elementow w pliku i na tej podstawie ucina
-		// to normalnie dziala tylko przed wyswietleniem sie pokazujje jakis error Idk czemu
-		// nie teraz to w ogole jakos losowo jeden filmik sie odpala drugi nie
-		// ale widze ze to nie jest tego wina tylko czegos co zrobilem poprzednio
-		//
-		//
-
-		//for i, j := 0, len(itemshist)-1; i < j; i, j = i+1, j-1 {
-		//	itemshist[i], itemshist[j] = itemshist[j], itemshist[i]
-		//}
-
-		// jak podziele przez 2 to w ogole sie wyswietla tylko peirwsze 11 zamiast 15 z jakiegos powodu also to chyba nie jest problem z dlugoscia tablicy tylko z tym jak on to laduje potem
-		// nawet jak dlugosc tablicy to jest 16 to i tak wyswietla 18
-		// i nie wiedziec czemu w history sie tez jakos losowo wyswietla kanal
-
-		// i chyba w ogole zapetla sie dokladnie 2 razy
-		// teraz chyba jest git tylko trzeba jeszcze jakos wykombinowac zeby sie przestalo zapetlac
-
-		/*for t := range maps.Keys(titleLinkMap) {
-			itemshist = append(itemshist, item(t))
-		} */
+		itemshist = itemshist[:linecounter]
 
 		lenHistory = len(titleLinkMap)
-
-		/*for title, link := range titleLinkMap {
-			fmt.Printf("%s: %s\n", title, link)
-		} */
 
 		link = "https://iv.nboeck.de/channel/UC7YOGHUfC1Tb6E4pudI9STA"
 
 		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
 	}
-
-	// wyglada na to ze z tym kodem jest wszystko git tylko cos sie psuje w tym wyswietlaniu go
 
 	link, ok = channels[m.choice]
 	if ok {

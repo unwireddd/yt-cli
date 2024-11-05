@@ -94,7 +94,21 @@ x2:
 			link := cutter.FindString(match)
 			match = strings.Replace(match, `https://www.youtube.com/`, fmt.Sprintf(""), -1)
 			match = strings.Replace(match, "watch?v=", "", 1)
-			match = strings.Replace(match, "?list=", "[Playlist]", 1)
+			//cutterlist := regexp.MustCompile(`^?list=[^ ]+ `)
+			// na dole ostatnia zmiana w projekcie na dzisiaj
+			//match = cutterlist.ReplaceAllString(match, "test")
+			testlista := regexp.MustCompile(`\?list=.*?\s`)
+			match = testlista.ReplaceAllString(match, "[Playlist]")
+			// test usuwanie whitespace
+
+			//dobra to dziala mozna jeszcze jakos wykombinowac zeby normalnie dawalo [playlist] na poczatku zamiast tych tabow jak przy linku
+			// ! teoretycznie w ogole zeby naprawic ze sie link od playlisty nie bedzie wyswietlal to mozna zamienic calego stringa na tablice, wywalic element z ?list= na poczatku i potem znowu na stringa
+			match = strings.TrimPrefix(match, "?list=")
+			//po tym wywaleniu linku regexem w playlistach pierwsze slowo ich sie nie laduje chyba a swoja
+			//match = strings.Replace(match, "?list=", "[Playlist]", 1)
+			// da sie normalnie usunac ten link z playlisty bo wczesniej juz to robilem tylko musze sobie przypomniec jak
+			// o mozna wywalic wszystko co jest po ?list az do spacji
+
 			//match = strings.Replace(match, "-", "/", 1)
 			// dobra jak to robie to cos sie dziwnego dzieje z tytulami z jakiegos powodu
 			// aaa moge chyba zwyczajnie w tym drugim zamienic myslniki na jakis inny znak i bedzie git
@@ -114,11 +128,11 @@ x2:
 		// !!! dobra teraz jak tak patrze na te historie to to w ogole nie jest to co powinno byc w sensie output.txt bo nie ma niektorych filmikow
 		// a nie jednak jest tylko w jakis dziwny sposob to dziala bo np jeden filmik pokazuje sie dopiero na 10 stronie
 		// ok czyli samo titleLinkMap jest w porzadku tylko to sie laduje jakos w nieskonczonosc chyba bo jest do 312
-		fmt.Println(itemshist)
+		//fmt.Println(itemshist)
 		// !!! dobra czyli generalnie to jest problem z tym ze itemshist sie zapetla w ktoryms momencie chyba
 		videos = titleLinkMap
 
-		fmt.Println(len(itemshist))
+		//fmt.Println(len(itemshist))
 		//listHeight = len(videos)
 		// a moze trzeba czesc tego kodu w ogole przeniesc do maina zamiast trzymac we frameworku
 	}

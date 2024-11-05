@@ -5,6 +5,12 @@ Naprawic wszystkie bugi, lista na dole:
 to jest niby rozwiazane ale potem jak sie wroce to przez goto statement sie cos psuje i mam za kazdym wybraniem innego kanalu te same filmiki
 
 -w niektorych przypadkach caly teminal sie wywala nie wiadomo czemu
--z history mozna usunac te duplikaty jakos podejrzewam ze mozna zrobic cos typu dynamiczne zmienianie length w funkcji w zaleznosci od tego ile jest elementow tam (to dziala tylko te filmiki to jakos losowo jeden sie odpala drugi nie)
+
 -naprawic ze mpv sie odpala 2 razy i te gowna z wpisywaniem przy add
+
 -naprawic wyswietlanie playlist w szukaniu
+
+-jak odpale filmik z historii jeszcze raz to powinien przeskakiwac na gore
+
+-odtwarzanie playlist w ogole nie dziala bo odpala sie tylko pierwszy filmik wiec w sumie moznaby to jakos naprawic w sensie zrobic kolejny model dla odpalania filmikow z playlist
+w teorii jakbym w koncu naprawil to wyswietlanie sie filmikow 2 razy w mpv to w ogole caly problem historii by zniknal

@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+// jak se wstawilem ta funkcje do framework.go to tez chyba nie dzialalo
+
 func countLines() {
 	file, err := os.Open("output.txt")
 	if err != nil {
@@ -24,6 +26,7 @@ func countLines() {
 		fmt.Println(err)
 		return
 	}
+	fmt.Sprintln("The line is", lineCount)
 
 	linecounter = lineCount
 }
