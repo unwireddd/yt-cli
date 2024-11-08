@@ -8,7 +8,7 @@ to jest niby rozwiazane ale potem jak sie wroce to przez goto statement sie cos 
 
 -naprawic ze mpv sie odpala 2 razy i te gowna z wpisywaniem przy add
 
--naprawic wyswietlanie playlist w szukaniu
+-teraz widze ze z ta historia jest problem i jak w nia wchodze to sie z jakiegos powodu odpala jeden filmik w kolko
 
 -jak odpale filmik z historii jeszcze raz to powinien przeskakiwac na gore
 

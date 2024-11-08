@@ -80,6 +80,7 @@ x2:
 		matches := re.FindAllString(owtput, -1)
 		for _, match := range matches {
 
+			// usuwanie elementow htmla
 			match = strings.Replace(match, "<a href=", "", -1)
 			if video < 10 {
 				match = strings.Replace(match, `><p dir="auto">`, "			", -1)
@@ -88,18 +89,50 @@ x2:
 			}
 			//match = strings.Replace(match, `><p dir="auto">`, "			", -1)
 			match = strings.Replace(match, `</p></a>`, "", -1)
+			// usuwanie cudzyslowiow
 			match = strings.Replace(match, `"`, "", -1)
+			// na dole mi zamienia link z samych znaczkow na wlasciwy link do youtuba
 			match = strings.Replace(match, `/`, fmt.Sprintf("https://www.youtube.com/"), -1)
+			// zaznacza wszystko co zaczyna sie na https
 			cutter := regexp.MustCompile(`https?://[^\s]+`)
+			// znajduje to co sie zaczyna, wywala link do youtuba
 			link := cutter.FindString(match)
 			match = strings.Replace(match, `https://www.youtube.com/`, fmt.Sprintf(""), -1)
 			match = strings.Replace(match, "watch?v=", "", 1)
+			// koniec wywalania linku do youtuba
 			//cutterlist := regexp.MustCompile(`^?list=[^ ]+ `)
 			// na dole ostatnia zmiana w projekcie na dzisiaj
 			//match = cutterlist.ReplaceAllString(match, "test")
+
+			// to mi zamienia match na playliste
+
 			testlista := regexp.MustCompile(`\?list=.*?\s`)
 			match = testlista.ReplaceAllString(match, "[Playlist]")
-			// test usuwanie whitespace
+
+			if strings.Contains(match, "[Playlist]") {
+
+				match = strings.ReplaceAll(match, "[Playlist]", "")
+				// takie cos dziala normalnie
+				match = fmt.Sprintf("%s [Playlist]", match)
+				// to ze wyswietlanie historii nagle nie dziala to nie jest wina tego jak cos i w poprzednim pushu z gh to juz tez nie dzialalo tylko tego nie zauwazylem
+
+			}
+
+			/*if strings.Contains(match, "[Playlist]") {
+				match = strings.Replace(match, "[Playlist]", "", -1)
+				match = fmt.Sprintf("%s [Playlist]", match)
+				fmt.Println(match)
+				// aha czyli jak to zrobie to playlisty sie w ogole nie pokazuja
+			} */
+
+			//match = strings.ReplaceAll(match, " ", "")
+			// trimspace nic nie daje tylko to replaceall to sprawia
+			//match = strings.TrimSpace(match)
+			// jak to zrobie to tez odpala pierwsza playliste
+
+			/*testspacje := regexp.MustCompile(`\s+`)
+			match = testspacje.ReplaceAllString(match, "") */
+			// jak zrobie to na gorze to mi z jakiegos powodu odpala pierwsza playliste
 
 			//dobra to dziala mozna jeszcze jakos wykombinowac zeby normalnie dawalo [playlist] na poczatku zamiast tych tabow jak przy linku
 			// ! teoretycznie w ogole zeby naprawic ze sie link od playlisty nie bedzie wyswietlal to mozna zamienic calego stringa na tablice, wywalic element z ?list= na poczatku i potem znowu na stringa
