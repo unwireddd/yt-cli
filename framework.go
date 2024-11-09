@@ -338,6 +338,7 @@ func (m modeltwo) Init() tea.Cmd {
 }
 
 func (m modeltwo) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.list.SetWidth(msg.Width)
@@ -346,8 +347,14 @@ func (m modeltwo) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 
 		switch keypress := msg.String(); keypress {
-		case "q", "ctrl+c":
+		case "q":
 			isgb = true
+			//m.choice = ""
+			// wyzerowanie zmiennej link tez nie dziala
+			// goto testowanko nie zadziala i wtedy w ogole sie wszystko zacina
+			// przez defer tez nie bedzie dzialac bo nie moze wejsc do funkcji po zamknieciu jej
+		case "ctrl+c":
+			return m, tea.Quit
 
 		case "enter":
 			i, ok := m.list.SelectedItem().(item)
@@ -479,7 +486,7 @@ func (m model) View() string {
 		}
 
 		encodedText := url.QueryEscape(text)
-		link = "https://iv.nboeck.de/search?q=" + encodedText
+		link = "https://inv.nadeko.net/search?q=" + encodedText
 		fmt.Println(link)
 		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
 	}
@@ -527,7 +534,7 @@ func (m model) View() string {
 
 		lenHistory = len(titleLinkMap)
 
-		link = "https://iv.nboeck.de/channel/UC7YOGHUfC1Tb6E4pudI9STA"
+		link = "https://inv.nadeko.net/channel/UC7YOGHUfC1Tb6E4pudI9STA"
 
 		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
 	}
@@ -540,6 +547,7 @@ func (m model) View() string {
 		return quitTextStyle.Render("Don't want to watch? That’s cool.")
 	}
 	return "\n" + m.list.View()
+
 }
 
 type modelthree struct {

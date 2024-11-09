@@ -1,5 +1,7 @@
 package main
 
+// dobra czyli generalnie widze ze juz wszystko podstawowe co powinno dziala w kwestii historii i szukania wiec mozna wrocic na jakis czas do naprawiania bugow z poruszaniem sie po programie
+
 import (
 	"fmt"
 	"maps"
@@ -16,7 +18,10 @@ import (
 var lista []list.Item
 var itemki []string
 var itemstwo []list.Item
+var itemsgb []list.Item
 var updatedMap = make(map[string]string)
+var sprawdzam []string
+var howgb = 0
 
 func removeFirstAlphanumeric(s string) string {
 	re := regexp.MustCompile(`^[a-zA-Z0-9_\-]+`)
@@ -25,6 +30,7 @@ func removeFirstAlphanumeric(s string) string {
 
 func main() {
 x2:
+
 	for key, value := range channelstwo {
 		newKey := strings.Replace(key, "_", " ", -1)
 		updatedMap[newKey] = value
@@ -153,6 +159,7 @@ x2:
 
 			videos[match] = link
 			video = video + 1
+
 		}
 	} else {
 		// notatka ze przeciez mam jeszcze ta mape co przy robieniu history sie zrobila
@@ -169,6 +176,15 @@ x2:
 		//listHeight = len(videos)
 		// a moze trzeba czesc tego kodu w ogole przeniesc do maina zamiast trzymac we frameworku
 	}
+	if isgb {
+		//howgb += 60
+		// tutaj pracowalem
+		sprawdzam = mecze[:60]
+		//fmt.Println(sprawdzam)
+
+		// zmienna sprawdzam jest git ale potem jak ja przypisuje do mecze to juz nie dziala
+		// mecze = sprawdzam
+	}
 
 	for i, str := range mecze {
 		mecze[i] = strings.ReplaceAll(str, "&#39;", "")
@@ -178,10 +194,19 @@ x2:
 
 	for i := range mecze {
 		// z tym bledem na dole to cos tutaj w sumie moze byc albo w sumie nie bo to goto drugim w mainie i tak mnie cofa do poczatku wiec moze trzeba jakos zrobic zeby przywracalo wartosci framework.go do tych co byly na poczatku
+		if isgb {
+
+			//itemstwo = append(itemstwo, item(sprawdzam[i]))
+			itemsgb = append(itemsgb, item(sprawdzam[i]))
+
+		}
 		itemstwo = append(itemstwo, item(mecze[i]))
 		// tylko mecze to jest w ogole ta tablica wiec w teorii ten kod jest w ogole niepotrzebny
 		// itemki jest uzywane 3 razy i potem nic sie z tym nie dzieje
 		itemki = append(itemki, mecze[i])
+
+		//}
+
 	}
 	// ! tutaj moge cos pokombinowac zeby w history bylo rozwiazane jakos identycznie
 x:
@@ -201,22 +226,41 @@ x:
 			os.Exit(1)
 		}
 	} else {
-		l = list.New(itemstwo, itemDelegate{}, defaultWidth, listHeight)
-		l.Title = "Select the video you'd like to watch"
-		l.SetShowStatusBar(false)
-		l.SetFilteringEnabled(false)
-		l.Styles.Title = titleStyle
-		l.Styles.PaginationStyle = paginationStyle
-		l.Styles.HelpStyle = helpStyle
 
-		m = modeltwo{list: l}
+		if isgb {
 
-		if _, err := tea.NewProgram(m.(tea.Model)).Run(); err != nil {
-			fmt.Println("Error running program:", err)
-			os.Exit(1)
+			l = list.New(itemsgb, itemDelegate{}, defaultWidth, listHeight)
+			l.Title = "Select the video you'd like to watch"
+			l.SetShowStatusBar(false)
+			l.SetFilteringEnabled(false)
+			l.Styles.Title = titleStyle
+			l.Styles.PaginationStyle = paginationStyle
+			l.Styles.HelpStyle = helpStyle
+
+			m = modeltwo{list: l}
+
+			if _, err := tea.NewProgram(m.(tea.Model)).Run(); err != nil {
+				fmt.Println("Error running program:", err)
+				os.Exit(1)
+			}
+		} else {
+			l = list.New(itemstwo, itemDelegate{}, defaultWidth, listHeight)
+			l.Title = "Select the video you'd like to watch"
+			l.SetShowStatusBar(false)
+			l.SetFilteringEnabled(false)
+			l.Styles.Title = titleStyle
+			l.Styles.PaginationStyle = paginationStyle
+			l.Styles.HelpStyle = helpStyle
+
+			m = modeltwo{list: l}
+
+			if _, err := tea.NewProgram(m.(tea.Model)).Run(); err != nil {
+				fmt.Println("Error running program:", err)
+				os.Exit(1)
+			}
 		}
-
 	}
+
 	// sprobuje jutro wyklikac ze wiecej filmikow bo moze one dlatego sie zapetlaja
 	/*
 		dobra czyli ogolnie kolejnosc jest zalatwiona tylko teraz trzeba ogarnac to zapetlanie i cala funkcja historii bedzie zrobiona
@@ -228,8 +272,13 @@ x:
 		//z link = "" i redeklarowaniem modelu jest dalej to samo
 		// jak cos to to nie jest problem z wartoscia linku tylko z lista prawdopodobnie
 		// also w ogole teraz jak to naprawilem to play next video ekran sie nie odpala tylko wraca do wyboru filmiku a jak za pierwszym razem odpalam bez cofania to normalnie jest
-		link = ""
+		//link = ""
+
 		goto x2
+		// !! o czyli jak sie wraca to sie wyswietlaja normalnie filmiki z innych kanalow tylko na poczatku tablicy a potem z tego co byl potem wybrany
+		// executowanie binarki na nowo nie dziala jak cos
+		// w ogole mozna cos poprobowac z tymi loopami jak mowili zamiast goto
+		// czyli tutaj generalnie najlepiej by bylo zeby to restartowalo caly program zamiast robic to goto
 	}
 	l = list.New(itemsthree, itemDelegate{}, defaultWidth, listHeight)
 	l.Title = "Select option"
