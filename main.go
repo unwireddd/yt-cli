@@ -30,7 +30,11 @@ func removeFirstAlphanumeric(s string) string {
 
 func main() {
 	// notatka ze nastawienie na poczatku isgb na false nie dziala ale chyba trzeba cos wlasnie probowac w ta strone
+
 x2:
+	// dobra czyli jak tutaj nastawie se isgb na false to sie wszystko w ogole psuje i jest tak jak przed zaimplementowaniem tego
+	// bo teraz zeby naprawic wiekszosc problemow z tym to powinno jakos na poczatku sie to robic na false zeby za kazdym razem tak tego nie bral
+	//isgb = false
 
 	for key, value := range channelstwo {
 		newKey := strings.Replace(key, "_", " ", -1)
@@ -249,6 +253,7 @@ x:
 				fmt.Println("Error running program:", err)
 				os.Exit(1)
 			}
+			// isgb = false tutaj to niby za pierwszym razem dziala ale potem sie robi to samo co wczesniej
 		} else {
 			l = list.New(itemstwo, itemDelegate{}, defaultWidth, listHeight)
 			l.Title = "Select the video you'd like to watch"
@@ -280,8 +285,9 @@ x:
 		// jak cos to to nie jest problem z wartoscia linku tylko z lista prawdopodobnie
 		// also w ogole teraz jak to naprawilem to play next video ekran sie nie odpala tylko wraca do wyboru filmiku a jak za pierwszym razem odpalam bez cofania to normalnie jest
 		//link = ""
-
+		// isgb = false tutaj tez sie robi to samo co wczesniej
 		goto x2
+
 		// !! o czyli jak sie wraca to sie wyswietlaja normalnie filmiki z innych kanalow tylko na poczatku tablicy a potem z tego co byl potem wybrany
 		// executowanie binarki na nowo nie dziala jak cos
 		// w ogole mozna cos poprobowac z tymi loopami jak mowili zamiast goto

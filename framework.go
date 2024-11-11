@@ -338,6 +338,8 @@ func (m modeltwo) Init() tea.Cmd {
 }
 
 func (m modeltwo) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	isgb = false
+	// o nice tutaj dziala
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -402,6 +404,8 @@ func (m modeltwo) View() string {
 	if m.quitting {
 		return quitTextStyle.Render("Don't want to watch? That’s cool.")
 	}
+	// isgb = false
+	// dobra czyli zrobienie tutaj isgb na false tez nie bedzie dzialalo bo tu jak jest q to nastawia isgb na true a potem na koncu sie i tak z tego robi false
 	return "\n" + m.list.View()
 }
 
