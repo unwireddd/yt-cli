@@ -29,6 +29,7 @@ func removeFirstAlphanumeric(s string) string {
 }
 
 func main() {
+	// notatka ze nastawienie na poczatku isgb na false nie dziala ale chyba trzeba cos wlasnie probowac w ta strone
 x2:
 
 	for key, value := range channelstwo {
@@ -179,7 +180,12 @@ x2:
 	if isgb {
 		//howgb += 60
 		// tutaj pracowalem
-		sprawdzam = mecze[:60]
+		// dobra czyli widze ze teraz generalnie wracanie sie dziala tylko jak juz jest to isgb to play next video i go back sie nie wyswietlaja z jakiegos powodu
+		sprawdzam = mecze[len(mecze)-60:]
+		fmt.Println(len(sprawdzam))
+		itemsgb = itemsgb[:0]
+		// ciekawe bo tablica sprawdzam ma zawsze 30 elementow jak ja tu wypisuje
+		// w sumie jak juz w ogole nie bedzie wyjscia to mozna sprobowac zduplikowac caly ten kod i go przepisac dla isgb
 		//fmt.Println(sprawdzam)
 
 		// zmienna sprawdzam jest git ale potem jak ja przypisuje do mecze to juz nie dziala
@@ -267,9 +273,10 @@ x:
 	*/
 
 	if isgb {
-		// tutaj wyswietla filmiki tego kanalu co sie wybralo na poczatku nie wiem do konca czemu
+		// czyli ze jesli isgb jest nastawione na tak co sie robi zawsze jak kilkne q zeby zmienic kanal to ten kod na dole sie w ogole nie bedzie executowal przez goto statement
+		// moze to isgb trzeba przeniesc jakos do srodka funkcji zeby to nie byla globalna zmienna to wtedy cos sie uda
+		// przeniesienie tego na dol nic nie daje jak cos bo wtedy ta lista z go back play next itp sie wyswietla nawet jak nic nie wybralem
 
-		//z link = "" i redeklarowaniem modelu jest dalej to samo
 		// jak cos to to nie jest problem z wartoscia linku tylko z lista prawdopodobnie
 		// also w ogole teraz jak to naprawilem to play next video ekran sie nie odpala tylko wraca do wyboru filmiku a jak za pierwszym razem odpalam bez cofania to normalnie jest
 		//link = ""
