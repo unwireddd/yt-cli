@@ -182,9 +182,13 @@ x2:
 		// a moze trzeba czesc tego kodu w ogole przeniesc do maina zamiast trzymac we frameworku
 	}
 	if isgb {
-		//howgb += 60
+		howgb += 60
+		// to mi sie moze przydac bo przy opcji wyszukiwania wtedy moge w jakis sposob te wszystkie zliczone filmiki usunac przy wyszukiwaniu
+		// also notatka ze to isgb to jest globalna wiec na dole cos z searchem dopiero
 		// tutaj pracowalem
 		// dobra czyli widze ze teraz generalnie wracanie sie dziala tylko jak juz jest to isgb to play next video i go back sie nie wyswietlaja z jakiegos powodu
+		// tutaj tez teraz jest jakis problem z index out of range po jakims czasie zmieniania kanalow z isgb z jakiegos powodu
+		// to na gorze jest spowodowane dodaniem isgb w string contains
 		sprawdzam = mecze[len(mecze)-60:]
 		fmt.Println(len(sprawdzam))
 		itemsgb = itemsgb[:0]
@@ -211,6 +215,7 @@ x2:
 
 		}
 		itemstwo = append(itemstwo, item(mecze[i]))
+
 		// tylko mecze to jest w ogole ta tablica wiec w teorii ten kod jest w ogole niepotrzebny
 		// itemki jest uzywane 3 razy i potem nic sie z tym nie dzieje
 		itemki = append(itemki, mecze[i])
@@ -255,6 +260,10 @@ x:
 			}
 			// isgb = false tutaj to niby za pierwszym razem dziala ale potem sie robi to samo co wczesniej
 		} else {
+			if strings.Contains(link, "search") {
+				//howgb += 60
+				itemstwo = itemstwo[howgb+60:]
+			}
 			l = list.New(itemstwo, itemDelegate{}, defaultWidth, listHeight)
 			l.Title = "Select the video you'd like to watch"
 			l.SetShowStatusBar(false)

@@ -12,3 +12,5 @@ Naprawic wszystkie bugi, lista na dole:
 w teorii jakbym w koncu naprawil to wyswietlanie sie filmikow 2 razy w mpv to w ogole caly problem historii by zniknal
 
 -dodac zeby jak jest isgb to mozna bylo uzywac potem historii i searcha
+
+-dodawanie kanalow przestalo dzialac

@@ -482,6 +482,9 @@ func (m model) View() string {
 	}
 
 	if m.choice == "Search" {
+		isgb = false
+		// jak tutaj nastawie isgb na false to jest znowu ten problem z tym ze na liscie najpierw sie wyswietlaja filmiki z poprzednich a potem dopiero szukana fraza a jak nie to jest out of range
+		// tutaj raczej sie nie da nic wykombinowac bo to tylko nastawia link a cale parsowanie jest w mainie
 		screen.Clear()
 
 		p := tea.NewProgram(initialModel())
@@ -496,6 +499,7 @@ func (m model) View() string {
 	}
 
 	if m.choice == "History" {
+		isgb = false
 		rmDuplicates()
 		isHistory = true
 		// output.txt to history z usunietymi duplikatami jak cos
