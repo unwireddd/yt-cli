@@ -20,6 +20,8 @@ import (
 	"github.com/inancgumus/screen"
 )
 
+// generalnie z tym przeskakiwaniem rzeczy na gorze w historii mozna zrobic cos takiego ze on za kazdym razem bedzie przy dodawaniu czegos skanowal cale output.txt czy jest tam cos o takiej samej nazwie i to
+
 var link string
 var text string
 var video int
@@ -428,7 +430,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch keypress := msg.String(); keypress {
 		case "q", "ctrl+c":
-			m.quitting = true
+			//m.quitting = true
 			return m, tea.Quit
 
 		case "enter":
@@ -448,9 +450,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	var ok bool
 
-	if m.choice == "Add / Remove a channel" {
+	if m.choice == "Add a channel" {
 		testowanko()
+		// z tym w ogole jest taki problem ze z tego co patrzylem po errorze to jak klikam w model add a channel to on z jakiegos powodu zaczyna od razu parsowanie zamiast wyswietlic ten model
 
+		// czyli wychodzi na to ze to sie z jakiegos powodu nie odpala
+		// podejrzewam ze problem jest w mainie a nie tutaj bo tutaj to nic nie zmienialem od dawna i sie dopiero po zrobieniu tego isgb zaczelo robic
 		if _, err := tea.NewProgram(initialModel3()).Run(); err != nil {
 			fmt.Printf("could not start program: %s\n", err)
 			os.Exit(1)
@@ -483,6 +488,7 @@ func (m model) View() string {
 
 	if m.choice == "Search" {
 		isgb = false
+		isHistory = false
 		// jak tutaj nastawie isgb na false to jest znowu ten problem z tym ze na liscie najpierw sie wyswietlaja filmiki z poprzednich a potem dopiero szukana fraza a jak nie to jest out of range
 		// tutaj raczej sie nie da nic wykombinowac bo to tylko nastawia link a cale parsowanie jest w mainie
 		screen.Clear()
@@ -528,6 +534,7 @@ func (m model) View() string {
 		for i, j := 0, len(itemkihist)-1; i < j; i, j = i+1, j-1 {
 			itemkihist[i], itemkihist[j] = itemkihist[j], itemkihist[i]
 		}
+		//itemkihist = itemkihist[:len(itemkihist)-1]
 
 		countLines()
 		fmt.Println(linecounter)
@@ -576,11 +583,12 @@ func (m modelthree) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch keypress := msg.String(); keypress {
-		case "q", "ctrl+c":
-			m.quitting = true
-			log.Fatal()
+		case "q":
+			// notatka ze to tutaj jest ten problem z tym ze caly terminal sie wywala
 			return m, tea.Quit
-
+		case "ctrl+c":
+			return m, tea.Quit
+			// o zmienienie jednego case na dwa osobne chyba zadzialalo
 		case "enter":
 			i, ok := m.list.SelectedItem().(item)
 			if ok {

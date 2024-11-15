@@ -1,1 +1,1 @@
-Metro	https://iv.nboeck.de/channel/UC9BbV-EWVTE2ixUnhZx-wZA Metro	https://iv.nboeck.de/channel/UC9BbV-EWVTE2ixUnhZx-wZA Metro_Warszawskie	https://iv.nboeck.de/channel/UC9BbV-EWVTE2ixUnhZx-wZA Metro_Warszawskie	https://iv.nboeck.de/channel/UC9BbV-EWVTE2ixUnhZx-wZA
+Tramwaje	https://inv.nadeko.net/channel/UCJXCU6rgb_pBvz9Cdi5S7SQ Tramwaje	https://inv.nadeko.net/channel/UCJXCU6rgb_pBvz9Cdi5S7SQ Koleje_Wielkopolskie	https://inv.nadeko.net/channel/UCwrzMDRRo2JfnLOP1UlnYeg Koleje_Wielkopolskie	https://inv.nadeko.net/channel/UCwrzMDRRo2JfnLOP1UlnYeg 

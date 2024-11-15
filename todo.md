@@ -2,7 +2,7 @@
 
 Naprawic wszystkie bugi, lista na dole:
 
--w niektorych przypadkach caly teminal sie wywala nie wiadomo czemu
+-w niektorych przypadkach caly teminal sie wywala nie wiadomo czemu (to chyba naprawione ale trzeba poszukac jeszcze)
 
 -naprawic ze mpv sie odpala 2 razy i te gowna z wpisywaniem przy add
 
@@ -14,3 +14,9 @@ w teorii jakbym w koncu naprawil to wyswietlanie sie filmikow 2 razy w mpv to w 
 -dodac zeby jak jest isgb to mozna bylo uzywac potem historii i searcha
 
 -dodawanie kanalow przestalo dzialac
+
+-jak wejde w historie a potem w searcha to sie w searchu pokazuja filmiki z historii
+
+-jak w dodawaniu kanalow zrobie cos co ma wiecej niz jedno slowo to znowu sie wywala i to pewnie jest zwiazane z tymi podlogami a nie jednak dziala
+
+-jak robie search na poczatku teraz to jest out of range

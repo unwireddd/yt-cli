@@ -77,6 +77,7 @@ x2:
 
 	m = model{list: l}
 
+	// ten problem tutaj jest najprawdopodobniej przez to ze w pliku history sie robi jakis whitespace nie wiem czemu
 	if _, err := tea.NewProgram(m).Run(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
@@ -86,6 +87,7 @@ x2:
 	if !isHistory {
 		ator, _ := soup.Get(link)
 		atorvid := soup.HTMLParse(ator)
+		// tutaj zeby to segmentation naprawic to trzeba jakis if statement na dole zrobic ze jak nie dziala to wychodzi normalnie
 		owtput := atorvid.Find("div", "class", "pure-g").HTML()
 		re := regexp.MustCompile(`<a[^>]*>.*?<p dir="auto">.*?</p>.*?</a>`)
 		matches := re.FindAllString(owtput, -1)
@@ -262,7 +264,11 @@ x:
 		} else {
 			if strings.Contains(link, "search") {
 				//howgb += 60
-				itemstwo = itemstwo[howgb+60:]
+				// notatka ze tutaj sie robi caly ten problem z historia ostatni i to sie prawdopodobnie robi dlatego ze dalem wczesniej isgb na false zeby naprawic buga z tym ze po historii search nie dziala
+
+				if howgb > 0 {
+					itemstwo = itemstwo[howgb+60:]
+				}
 			}
 			l = list.New(itemstwo, itemDelegate{}, defaultWidth, listHeight)
 			l.Title = "Select the video you'd like to watch"
