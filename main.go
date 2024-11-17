@@ -236,7 +236,7 @@ x:
 		l.Styles.PaginationStyle = paginationStyle
 		l.Styles.HelpStyle = helpStyle
 
-		m = modeltwo{list: l}
+		m = &modeltwo{list: l}
 
 		if _, err := tea.NewProgram(m.(tea.Model)).Run(); err != nil {
 			fmt.Println("Error running program:", err)
@@ -254,7 +254,7 @@ x:
 			l.Styles.PaginationStyle = paginationStyle
 			l.Styles.HelpStyle = helpStyle
 
-			m = modeltwo{list: l}
+			m = &modeltwo{list: l}
 
 			if _, err := tea.NewProgram(m.(tea.Model)).Run(); err != nil {
 				fmt.Println("Error running program:", err)
@@ -278,7 +278,7 @@ x:
 			l.Styles.PaginationStyle = paginationStyle
 			l.Styles.HelpStyle = helpStyle
 
-			m = modeltwo{list: l}
+			m = &modeltwo{list: l}
 
 			if _, err := tea.NewProgram(m.(tea.Model)).Run(); err != nil {
 				fmt.Println("Error running program:", err)
@@ -317,7 +317,7 @@ x:
 	l.Styles.HelpStyle = helpStyle
 	screen.Clear()
 
-	m = modelthree{list: l}
+	m = &modelthree{list: l}
 
 	if _, err := tea.NewProgram(m.(tea.Model)).Run(); err != nil {
 		fmt.Println("Error running program:", err)

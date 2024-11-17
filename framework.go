@@ -1,3 +1,6 @@
+// dobra czyli tutaj jest ta stara wersja z gh ale w niej jest naprawiony problem z odpalaniem sie 2 razy ktory w sumie byl jednym z najwazniejszych w calym tym projekcie
+// prawdopodobnie najlepiej jest ja zostawic bo nie strace na tym az tak duzo
+
 package main
 
 import (
@@ -339,7 +342,7 @@ func (m modeltwo) Init() tea.Cmd {
 	return nil
 }
 
-func (m modeltwo) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *modeltwo) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	isgb = false
 	// o nice tutaj dziala
 
@@ -374,12 +377,13 @@ func (m modeltwo) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m modeltwo) View() string {
+func (m *modeltwo) View() string {
 	globaltest = m.choice
 	var ok bool
 	filePath := "history"
 
 	link, ok = videos[m.choice]
+	m.choice = ""
 
 	// to jest do zapisywania historii
 	for key, value := range videos {
@@ -575,7 +579,7 @@ func (m modelthree) Init() tea.Cmd {
 	return nil
 }
 
-func (m modelthree) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *modelthree) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.list.SetWidth(msg.Width)
@@ -603,7 +607,7 @@ func (m modelthree) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m modelthree) View() string {
+func (m *modelthree) View() string {
 
 	if m.choice == "Play next video" {
 
