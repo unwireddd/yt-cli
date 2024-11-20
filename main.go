@@ -29,9 +29,11 @@ func removeFirstAlphanumeric(s string) string {
 }
 
 func main() {
+
 	// notatka ze nastawienie na poczatku isgb na false nie dziala ale chyba trzeba cos wlasnie probowac w ta strone
 
 x2:
+	howgb = 0
 	// dobra czyli jak tutaj nastawie se isgb na false to sie wszystko w ogole psuje i jest tak jak przed zaimplementowaniem tego
 	// bo teraz zeby naprawic wiekszosc problemow z tym to powinno jakos na poczatku sie to robic na false zeby za kazdym razem tak tego nie bral
 	//isgb = false
@@ -183,6 +185,9 @@ x2:
 		//listHeight = len(videos)
 		// a moze trzeba czesc tego kodu w ogole przeniesc do maina zamiast trzymac we frameworku
 	}
+
+	// pierwszy ifstatement z isgb jest tutaj
+	// also moze to jest problem we frameworku trzeba porownac tez z nowa a nie bo w nowej sie tez robi out of range
 	if isgb {
 		howgb += 60
 		// to mi sie moze przydac bo przy opcji wyszukiwania wtedy moge w jakis sposob te wszystkie zliczone filmiki usunac przy wyszukiwaniu
@@ -191,9 +196,18 @@ x2:
 		// dobra czyli widze ze teraz generalnie wracanie sie dziala tylko jak juz jest to isgb to play next video i go back sie nie wyswietlaja z jakiegos powodu
 		// tutaj tez teraz jest jakis problem z index out of range po jakims czasie zmieniania kanalow z isgb z jakiegos powodu
 		// to na gorze jest spowodowane dodaniem isgb w string contains
+
+		// dobra czyli mozliwe ze tutaj jest problem z tym mechanizmem ze usuwa poprzednie filmiki z listy
+		// ja tu chyba dawalem jakis ifstatement zeby to naprawic z tego co mi sie przypomina
 		sprawdzam = mecze[len(mecze)-60:]
+		// ale jak cos to tutaj jest caly problem w linijce na gorze
+		// tutaj jak cos jest rozwiazanie do tego w nowszej wersji tylko trzeba teraz to wszystko poprzenosic
+		// dobra chyba jednak nie ma bo jak teraz odpalam nowa wersje to tez sie robi out of range po jakims czasie
+		// w sumie to moze byc problem z tymi pointerami wiec notatka na jutro zeby sprawdzic czy dalej sie bedzie robic jak je wywale nie to nie przez to
 		fmt.Println(len(sprawdzam))
 		itemsgb = itemsgb[:0]
+		// btw na gore kodu nawet nie ma co patrzec w tym przypadku bo tam nie ma nic z isgb poza zadeklarowaniem howgb na zero i sprawdzam jako listy
+		// to na gorze jest do wywalania tych filmikow z poprzednich list
 		// ciekawe bo tablica sprawdzam ma zawsze 30 elementow jak ja tu wypisuje
 		// w sumie jak juz w ogole nie bedzie wyjscia to mozna sprobowac zduplikowac caly ten kod i go przepisac dla isgb
 		//fmt.Println(sprawdzam)
@@ -264,8 +278,11 @@ x:
 		} else {
 			if strings.Contains(link, "search") {
 				//howgb += 60
+				// tutaj jest problem ze jak sie cofne minimum raz to sie nie pokazuja wszystkie filmiki z searcha
 				// notatka ze tutaj sie robi caly ten problem z historia ostatni i to sie prawdopodobnie robi dlatego ze dalem wczesniej isgb na false zeby naprawic buga z tym ze po historii search nie dziala
 
+				// poza dodawaniem przy ifstatemencie tego howgb  to to jest jedyny moment w ktorym to jest faktycznie uzywane
+				// a to na dole jest do wywalania tych filmikow wszystkich co sie pododawaly wczesniej z searcha
 				if howgb > 0 {
 					itemstwo = itemstwo[howgb+60:]
 				}

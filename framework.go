@@ -486,7 +486,7 @@ func (m model) View() string {
 		if err != nil {
 			panic(err)
 		}
-		link = channels[nazwa]
+		link = nazwaLink
 		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
 	}
 

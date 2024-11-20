@@ -13,10 +13,5 @@ w teorii jakbym w koncu naprawil to wyswietlanie sie filmikow 2 razy w mpv to w 
 
 -dodac zeby jak jest isgb to mozna bylo uzywac potem historii i searcha
 
--dodawanie kanalow przestalo dzialac
+-dodac pointery do wszystkich innych modeli ktore wyswietlaja sie wiecej niz raz
 
--jak wejde w historie a potem w searcha to sie w searchu pokazuja filmiki z historii
-
--jak w dodawaniu kanalow zrobie cos co ma wiecej niz jedno slowo to znowu sie wywala i to pewnie jest zwiazane z tymi podlogami a nie jednak dziala
-
--jak robie search na poczatku teraz to jest out of range
