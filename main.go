@@ -189,7 +189,9 @@ x2:
 	// pierwszy ifstatement z isgb jest tutaj
 	// also moze to jest problem we frameworku trzeba porownac tez z nowa a nie bo w nowej sie tez robi out of range
 	if isgb {
-		howgb += 60
+		lendeleting := len(mecze)
+		howgb += len(mecze)
+
 		// to mi sie moze przydac bo przy opcji wyszukiwania wtedy moge w jakis sposob te wszystkie zliczone filmiki usunac przy wyszukiwaniu
 		// also notatka ze to isgb to jest globalna wiec na dole cos z searchem dopiero
 		// tutaj pracowalem
@@ -199,7 +201,10 @@ x2:
 
 		// dobra czyli mozliwe ze tutaj jest problem z tym mechanizmem ze usuwa poprzednie filmiki z listy
 		// ja tu chyba dawalem jakis ifstatement zeby to naprawic z tego co mi sie przypomina
-		sprawdzam = mecze[len(mecze)-60:]
+
+		// !!dobra widze gdzie jest problem z tym out of range niektore kanaly maja mniej niz 60 filmikow i od tego to sie robi
+		// widze ze teraz chyba dziala
+		sprawdzam = mecze[len(mecze)-lendeleting:]
 		// ale jak cos to tutaj jest caly problem w linijce na gorze
 		// tutaj jak cos jest rozwiazanie do tego w nowszej wersji tylko trzeba teraz to wszystko poprzenosic
 		// dobra chyba jednak nie ma bo jak teraz odpalam nowa wersje to tez sie robi out of range po jakims czasie
@@ -283,8 +288,11 @@ x:
 
 				// poza dodawaniem przy ifstatemencie tego howgb  to to jest jedyny moment w ktorym to jest faktycznie uzywane
 				// a to na dole jest do wywalania tych filmikow wszystkich co sie pododawaly wczesniej z searcha
+
+				// widze ze to tutaj jest zrobione normalnie jak powinno byc tylko z jakiegos powodu nie dziala albo tego nie lapie
 				if howgb > 0 {
 					itemstwo = itemstwo[howgb+60:]
+					//itemstwo = itemstwo[:len(mecze)]
 				}
 			}
 			l = list.New(itemstwo, itemDelegate{}, defaultWidth, listHeight)

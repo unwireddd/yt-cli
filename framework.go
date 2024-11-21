@@ -215,6 +215,8 @@ func (m modelfour) Init() tea.Cmd {
 	return textinput.Blink
 }
 
+// czyli tutaj tez trzeba pokombinowac z pointerami zeby to wyswietlanie searcha 2 razy sie naprawilo i dodawania ale to jest troche inaczej skonstruowane niz tamte poprzednie z listami
+// tez widze ze przez to ze tutaj jest initialmodel i przez niego to jest wywolywane
 func (m modelfour) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
@@ -496,6 +498,9 @@ func (m model) View() string {
 		// jak tutaj nastawie isgb na false to jest znowu ten problem z tym ze na liscie najpierw sie wyswietlaja filmiki z poprzednich a potem dopiero szukana fraza a jak nie to jest out of range
 		// tutaj raczej sie nie da nic wykombinowac bo to tylko nastawia link a cale parsowanie jest w mainie
 		screen.Clear()
+
+		// teraz z tym znowu jest jakis problem ze jak wejde w jakis kanal a potem z niego do searcha to sie wyswietlaja filmiki z niego co juz kiedys chyba bylo naprawiane tylko nie pamietam w jaki sposob
+		// no widze ze w tej nowej wersji tez jest ten problem nie wiem w ogole jak to sie stalo ze wszystkie bugfixy poprzednie nagle jakos zniknely
 
 		p := tea.NewProgram(initialModel())
 		if _, err := p.Run(); err != nil {

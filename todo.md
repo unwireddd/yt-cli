@@ -2,8 +2,6 @@
 
 Naprawic wszystkie bugi, lista na dole:
 
--w niektorych przypadkach caly teminal sie wywala nie wiadomo czemu (to chyba naprawione ale trzeba poszukac jeszcze)
-
 -naprawic ze mpv sie odpala 2 razy i te gowna z wpisywaniem przy add
 
 -jak odpale filmik z historii jeszcze raz to powinien przeskakiwac na gore
