@@ -165,6 +165,8 @@ func (m *modelsix) updateInputs(msg tea.Msg) tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
+// tu jak jest pointer reciever to sie cos psuje tez jak cos
+
 func (m modelsix) View() string {
 	var b strings.Builder
 

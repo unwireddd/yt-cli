@@ -22,6 +22,7 @@ var itemsgb []list.Item
 var updatedMap = make(map[string]string)
 var sprawdzam []string
 var howgb = 0
+var sprawdzanieczegos int
 
 func removeFirstAlphanumeric(s string) string {
 	re := regexp.MustCompile(`^[a-zA-Z0-9_\-]+`)
@@ -31,9 +32,9 @@ func removeFirstAlphanumeric(s string) string {
 func main() {
 
 	// notatka ze nastawienie na poczatku isgb na false nie dziala ale chyba trzeba cos wlasnie probowac w ta strone
+	howgb = 0
 
 x2:
-	howgb = 0
 	// dobra czyli jak tutaj nastawie se isgb na false to sie wszystko w ogole psuje i jest tak jak przed zaimplementowaniem tego
 	// bo teraz zeby naprawic wiekszosc problemow z tym to powinno jakos na poczatku sie to robic na false zeby za kazdym razem tak tego nie bral
 	//isgb = false
@@ -263,6 +264,7 @@ x:
 		}
 	} else {
 
+		// jak tutaj pozmienialem tego strukture to sie w ogole cos ekstremalnie popsulo bo w ogole sie listy nie wyswietlaly
 		if isgb {
 
 			l = list.New(itemsgb, itemDelegate{}, defaultWidth, listHeight)
@@ -281,8 +283,16 @@ x:
 			}
 			// isgb = false tutaj to niby za pierwszym razem dziala ale potem sie robi to samo co wczesniej
 		} else {
+			// to jest w ogole ciekawe bo na gorze jest isgb wiec on tutaj chyba zaklada ze to nie jest isgb dlatego moze to sie nie wykonuje
 			if strings.Contains(link, "search") {
-				//howgb += 60
+				//fmt.Println("test test test test")
+				//fmt.Println(howgb)
+				// howgb += len(mecze) to nie zadziala bo mecze to sa te mecze ktore sie robia od szukania
+				//fmt.Println(howgb)
+				// wychodzi na to ze howgb tutaj gdzies sie zeruje
+
+				// ale dobra z tego co jest na gorze wynika ze tutaj to normalnie wylapuje jak jest search
+
 				// tutaj jest problem ze jak sie cofne minimum raz to sie nie pokazuja wszystkie filmiki z searcha
 				// notatka ze tutaj sie robi caly ten problem z historia ostatni i to sie prawdopodobnie robi dlatego ze dalem wczesniej isgb na false zeby naprawic buga z tym ze po historii search nie dziala
 
@@ -290,11 +300,34 @@ x:
 				// a to na dole jest do wywalania tych filmikow wszystkich co sie pododawaly wczesniej z searcha
 
 				// widze ze to tutaj jest zrobione normalnie jak powinno byc tylko z jakiegos powodu nie dziala albo tego nie lapie
+				sprawdzanieczegos = len(mecze)
+				// czyli len od mecze jest zrobione normalnie ze to by dzialalo tylko trzeba ogarnac teraz usuwanie tego
+
+				// dobra czyli z tego co przetestowalem to wynika ze to na dole sie w ogole nie wykonuje
+				// itemkidwa := itemstwo
+				// fmt.Println(itemstwo)
+
+				itemstwo = itemstwo[howgb:]
+				finalremove := len(itemstwo) - len(mecze)
+				itemstwo = itemstwo[finalremove:]
+				// z dwukropkiem na koncu usunal pierwsze 17 a na poczatku wszystko poza pierwszymi 17
+				//fmt.Println(itemstwo)
+				// zrobienie nowej zmiennej tez nie dziala wiec tutaj problem lezy w ucinaniu tego a nie w samej zmiennej / liscie
+				//fmt.Println(itemstesty)
+				//czyli po wyprintowaniu tego 2 razy wychodzi na to ze to uciecie itemstwo nic tutaj nie daje w ogole
+
+				// notatka ze wywalanie rzeczy z listy inna metoda niz dwukropkiem nie dziala bo to nie tablica i ma inny typ
+				// trzeba sprobowac zrobic dla searcha nowa liste chyba
 				if howgb > 0 {
-					itemstwo = itemstwo[howgb+60:]
+					//itemstwo = itemstwo[sprawdzanieczegos:]
+					fmt.Println(itemstwo)
 					//itemstwo = itemstwo[:len(mecze)]
 				}
 			}
+
+			//itemstwo = itemstwo[:sprawdzanieczegos]
+			//fmt.Println(itemstwo)
+			fmt.Println(len(itemstwo))
 			l = list.New(itemstwo, itemDelegate{}, defaultWidth, listHeight)
 			l.Title = "Select the video you'd like to watch"
 			l.SetShowStatusBar(false)

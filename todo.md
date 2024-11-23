@@ -2,7 +2,7 @@
 
 Naprawic wszystkie bugi, lista na dole:
 
--naprawic ze mpv sie odpala 2 razy i te gowna z wpisywaniem przy add
+-dodawanie kanalow sie wyswietla 2 razy i tam jest problem z pointerami
 
 -jak odpale filmik z historii jeszcze raz to powinien przeskakiwac na gore
 
