@@ -240,6 +240,8 @@ x2:
 
 		// tylko mecze to jest w ogole ta tablica wiec w teorii ten kod jest w ogole niepotrzebny
 		// itemki jest uzywane 3 razy i potem nic sie z tym nie dzieje
+		// jednak sie dzieje jak cos bo to jest zrobione do play next video
+
 		itemki = append(itemki, mecze[i])
 
 		//}
@@ -285,6 +287,8 @@ x:
 		} else {
 			// to jest w ogole ciekawe bo na gorze jest isgb wiec on tutaj chyba zaklada ze to nie jest isgb dlatego moze to sie nie wykonuje
 			if strings.Contains(link, "search") {
+
+				// jak po tym dam play next video to chyba sie wyswietla z jakiejs innej listy filmik
 				//fmt.Println("test test test test")
 				//fmt.Println(howgb)
 				// howgb += len(mecze) to nie zadziala bo mecze to sa te mecze ktore sie robia od szukania
@@ -323,6 +327,13 @@ x:
 					fmt.Println(itemstwo)
 					//itemstwo = itemstwo[:len(mecze)]
 				}
+
+				itemki = itemki[howgb:]
+				itemki = itemki[finalremove:]
+				// fmt.Println(itemki)
+				// czyli przy samym play next video to nie jest problem z lista itemki bo ona to sa normalnie dobre filmiki wszystkie jak powinno byc
+
+				// teraz widze ze play next video jakos dziala ale nie wiem dokladnie o co z tym chodzi bo to w ogole wyswietla chyba jakis losowy filmik z tej listy wiec musze ogarnac mniej wiecej jak to dziala
 			}
 
 			//itemstwo = itemstwo[:sprawdzanieczegos]

@@ -382,6 +382,7 @@ func (m *modeltwo) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *modeltwo) View() string {
+	// tutaj jest pierwszy raz ten globaltest ktory sie przypisuje do filmiku z listy filmikow
 	globaltest = m.choice
 	var ok bool
 	filePath := "history"
@@ -618,6 +619,8 @@ func (m *modelthree) View() string {
 
 	if m.choice == "Play next video" {
 
+		// START to cale jest w ogole do zignorowania bo tylko przypisuje rzeczy do historii
+
 		for key, value := range videos {
 			if value == link {
 				combinated := fmt.Sprintf("%s [Line break here] %s\n", key, link)
@@ -634,14 +637,24 @@ func (m *modelthree) View() string {
 			}
 		}
 
+		// KONIEC
+
 		var index int
+		// jak cos to itemki to jest normalna tablica a nie lista wiec z jakims dziwnym przeskakiwaniem w kolejnosci tez nie powinno byc problemow
+		// also widze ze jak jednak szukam w samym frontendzie to tez te filmiki jakos dziwnie przeskakuja wiec tu problem moze byc w tym ze on to jakos jeszcze raz skanuje przy play next czy cos
 		for i, value := range itemki {
 			if value == globaltest {
+				// globaltest to juz jest w tym drugim m.choice z modeltwo w ktorym jest link w sensie normalne szukanie czyli z tym jest niby wszystko git
 				index = i
 				break
 			}
 		}
+
+		fmt.Println(index)
+		// w tym momencie index jest 0 czyli tak jak powinno byc a po dodaniu jest 1 czyli tez teoretycznie dobrze
+		// a jak juz dam filmik 6 to tez jest 0 i 1 z jakiegos powodu
 		index = index + 1
+		fmt.Println(index)
 		m.choice = itemki[index]
 		link = videos[m.choice]
 		testt := exec.Command("mpv", link)
