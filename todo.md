@@ -13,3 +13,7 @@ w teorii jakbym w koncu naprawil to wyswietlanie sie filmikow 2 razy w mpv to w 
 
 -dodac pointery do wszystkich innych modeli ktore wyswietlaja sie wiecej niz raz
 
+-z go back to videos list sie robi ten sam problem co w przypadku isgb z normalnym listowaniem tego
+
+-also play previous video tez nie dziala z jakiegos powodu
+

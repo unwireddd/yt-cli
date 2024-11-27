@@ -23,6 +23,7 @@ var updatedMap = make(map[string]string)
 var sprawdzam []string
 var howgb = 0
 var sprawdzanieczegos int
+var mapConvert []string
 
 func removeFirstAlphanumeric(s string) string {
 	re := regexp.MustCompile(`^[a-zA-Z0-9_\-]+`)
@@ -59,6 +60,17 @@ x2:
 		item("Go back to videos list"),
 	}
 	var mecze []string
+
+	// tutaj sprobuje ta mapke zmienic na tablice zeby te kanaly tak nie przeskakiwaly w kolejnosci co chwila
+
+	/*for t := range maps.Keys(channels) {
+		fmt.Println(t)
+		mapConvert = append(mapConvert, t)
+	}*/
+
+	// dobra czyli to nie zadziala dlatego ze po pierwsze w tablicy sa same klucze i nie ma wartosci ich
+	// also zeby to faktycznie zadzialalo to mozna po prostu sprobowac przerobic i wartosci i klucze na mapke a potem to jakos laczyc ze soba
+	// i ogolnie to zeby to zawsze mialo ta sama kolejnosc to ta mapka powinna byc posortowana a w go sie tak nie da
 
 	for t := range maps.Keys(channels) {
 		items = append(items, item(t))

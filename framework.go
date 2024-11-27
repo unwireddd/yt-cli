@@ -1,5 +1,6 @@
-// dobra czyli tutaj jest ta stara wersja z gh ale w niej jest naprawiony problem z odpalaniem sie 2 razy ktory w sumie byl jednym z najwazniejszych w calym tym projekcie
-// prawdopodobnie najlepiej jest ja zostawic bo nie strace na tym az tak duzo
+// JUTRO POL GODZINY WIECEJ ROBIE PRZEZ DISTROHOPPING PIERDOLONY
+
+// jutro te pointery z maila ogarnac
 
 package main
 
@@ -371,6 +372,7 @@ func (m *modeltwo) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			i, ok := m.list.SelectedItem().(item)
 			if ok {
 				m.choice = string(i)
+				globaltest = m.choice
 			}
 			return m, tea.Quit
 		}
@@ -383,11 +385,26 @@ func (m *modeltwo) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *modeltwo) View() string {
 	// tutaj jest pierwszy raz ten globaltest ktory sie przypisuje do filmiku z listy filmikow
-	globaltest = m.choice
+
 	var ok bool
 	filePath := "history"
 
+	//fmt.Println("Test starts here")
+	//fmt.Println(m.choice)
+	//fmt.Println("Test ends here")
+
+	// a moze to to updatea trzeba przeniesc czy cos
+	// z testow wynika ze m.choice tutaj w ogole jeszcze nie mam tez ma to w sumie sens bo przeciez m.choice to jest to co wybralem w kanalach
+
 	link, ok = videos[m.choice]
+
+	//fmt.Println(videos[m.choice])
+	//globaltest = m.choice
+	/*fmt.Println("The globaltest variable")
+	//fmt.Println(globaltest)
+	fmt.Println(m.choice)
+	fmt.Println("tests end")*/
+
 	m.choice = ""
 
 	// to jest do zapisywania historii
@@ -408,6 +425,7 @@ func (m *modeltwo) View() string {
 	}
 
 	if ok {
+
 		testt := exec.Command("mpv", link)
 		testt.Run()
 		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
@@ -417,7 +435,9 @@ func (m *modeltwo) View() string {
 	}
 	// isgb = false
 	// dobra czyli zrobienie tutaj isgb na false tez nie bedzie dzialalo bo tu jak jest q to nastawia isgb na true a potem na koncu sie i tak z tego robi false
+
 	return "\n" + m.list.View()
+
 }
 
 type model struct {
@@ -619,6 +639,8 @@ func (m *modelthree) View() string {
 
 	if m.choice == "Play next video" {
 
+		// generalnie w tym calym to problem jest taki ze wartosc m.choice czyli tym samym globaltest jest pusta bo cos tam sie psuje na gorze przy view tej funkcji
+
 		// START to cale jest w ogole do zignorowania bo tylko przypisuje rzeczy do historii
 
 		for key, value := range videos {
@@ -642,8 +664,14 @@ func (m *modelthree) View() string {
 		var index int
 		// jak cos to itemki to jest normalna tablica a nie lista wiec z jakims dziwnym przeskakiwaniem w kolejnosci tez nie powinno byc problemow
 		// also widze ze jak jednak szukam w samym frontendzie to tez te filmiki jakos dziwnie przeskakuja wiec tu problem moze byc w tym ze on to jakos jeszcze raz skanuje przy play next czy cos
+
+		// wychodzi na to ze globaltest jest puste co by wyjasnialo dlaczego nie dziala
+		// prawdopodobnie to wina tego pointera bo wczesniej to normalnie dzialalo jak powinno
 		for i, value := range itemki {
 			if value == globaltest {
+
+				// czyli to nastepne to zwyczajnie zawsze jest 1 niewazne co wiec z odwracaniem tablicy opcja odpada
+
 				// globaltest to juz jest w tym drugim m.choice z modeltwo w ktorym jest link w sensie normalne szukanie czyli z tym jest niby wszystko git
 				index = i
 				break
@@ -654,6 +682,8 @@ func (m *modelthree) View() string {
 		// w tym momencie index jest 0 czyli tak jak powinno byc a po dodaniu jest 1 czyli tez teoretycznie dobrze
 		// a jak juz dam filmik 6 to tez jest 0 i 1 z jakiegos powodu
 		index = index + 1
+
+		// zawsze jest na 0 i 1 i z tego co widze to teraz np sie w ogole pokazal ten sam filmik
 		fmt.Println(index)
 		m.choice = itemki[index]
 		link = videos[m.choice]
@@ -663,7 +693,7 @@ func (m *modelthree) View() string {
 	}
 
 	if m.choice == "Play previous video" {
-
+		// START historia do zignorowania
 		for key, value := range videos {
 			if value == link {
 				combinated := fmt.Sprintf("%s [Line break here] %s\n", key, link)
@@ -679,6 +709,8 @@ func (m *modelthree) View() string {
 			}
 		}
 
+		// KONIEC
+
 		var index int
 		for i, value := range itemki {
 			if value == globaltest {
@@ -688,9 +720,14 @@ func (m *modelthree) View() string {
 		}
 
 		if index == 0 {
+			// dobra widze czyli tu jest ten problem co u gory ze jest zawsze 0 i 1 jak printuje to z jakiegos powodu
 			return quitTextStyle.Render(fmt.Sprintf("%s? I can't see any previous video.", m.choice))
 		}
+		fmt.Println(index)
+		// w tym momencie index jest 0 czyli tak jak powinno byc a po dodaniu jest 1 czyli tez teoretycznie dobrze
+		// a jak juz dam filmik 6 to tez jest 0 i 1 z jakiegos powodu
 		index = index - 1
+		fmt.Println(index)
 		m.choice = itemki[index]
 		link = videos[m.choice]
 		testt := exec.Command("mpv", link)
@@ -699,6 +736,8 @@ func (m *modelthree) View() string {
 	}
 
 	if m.choice == "Go back to videos list" {
+		// ciekawe w sumie bo przy go back to sie w ogole gdzies zapetla i caly czas jest
+		// jak bede ogarniac zapetlanie tego to mozna popatrzec na to potem
 		testowanie = m.choice
 		return "ok"
 	}
