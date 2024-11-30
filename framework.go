@@ -1,5 +1,3 @@
-// JUTRO POL GODZINY WIECEJ ROBIE PRZEZ DISTROHOPPING PIERDOLONY
-
 // jutro te pointery z maila ogarnac
 
 package main
@@ -44,6 +42,7 @@ var linkingError string
 var isgb bool
 var lenHistory int
 var linecounter int
+var testowaniedrugiejrzeczy string
 
 var (
 	focusedStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
@@ -234,8 +233,11 @@ func (m *modelfour) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case tea.KeyCtrlC:
 
-			// zrobienie tutaj tego tak samo jak w tamtych innych z isgb true nie dziala jak cos pewnie przez strukture tego modelu ze inna
+			// wazna rzecz ze tea.Quit sprawia ze program idzie dalej zamiast go wylaczac
 
+			// zrobienie tutaj tego tak samo jak w tamtych innych z isgb true nie dziala jak cos pewnie przez strukture tego modelu ze inna
+			//testowaniedrugiejrzeczy = "Yes"
+			isQuittin = true
 			isgb = true
 			//dalej nie dziala ale tutaj to wyglada jakby w ogole tego nie wykrywalo z jakiegos powodu
 			// trzeba zrobic cos takiego zeby tutaj sie wracalo albo zeby w jakis sposob wywalalo caly program jak to dam
@@ -483,8 +485,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch keypress := msg.String(); keypress {
 		case "q":
 
+			isQuittin = true
+
 			//m.quitting = true
-			return m, tea.Quit
+			//return m, tea.Quit
 		case "ctrl+c":
 			return m, tea.Quit
 
@@ -558,6 +562,11 @@ func (m model) View() string {
 			log.Fatal(err)
 		}
 
+		if testowaniedrugiejrzeczy == "Yes" {
+			log.SetOutput(io.Discard)
+			log.Panic("Quitting...")
+		}
+
 		encodedText := url.QueryEscape(text)
 		link = "https://inv.nadeko.net/search?q=" + encodedText
 		fmt.Println(link)
@@ -569,6 +578,8 @@ func (m model) View() string {
 		// tutaj tez teoretycznie os.Exit powinno rozwiazac sprawe ale bedzie ten sam problem co z innymi rzeczami
 
 		isgb = false
+		// zamienianie isgb tutaj chyba tez nic nie daje jak cos ale idk
+
 		rmDuplicates()
 		isHistory = true
 		// output.txt to history z usunietymi duplikatami jak cos

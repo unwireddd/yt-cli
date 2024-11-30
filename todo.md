@@ -6,10 +6,5 @@ Naprawic wszystkie bugi, lista na dole:
 
 -dodawanie kanalow sie wyswietla 2 razy i tam jest problem z pointerami (nie wiadomo czy to jest problem z pointerami ale raczej nie bo jak to naprawilem to dalej jest to samo)
 
--wychodzenie z searcha sie psuje tez btw
-
--dobra widze ze znowu jest jakis problem z tym ze jak wyjde z historii to sie nie wyswietlaja filmiki
-
-
 also z dobrych informacji to wydaje sie ze te wszystkie poprzednie rzeczy dzialaja w miare sprawnie juz i to przeskakiwanie na gore w historii juz chyba dziala
 
