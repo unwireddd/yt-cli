@@ -1,19 +1,15 @@
 - Dodac wyswietlanie filmow z wiekszej liczby stron zamiast tylko pierwszych 30
-
-Naprawic wszystkie bugi, lista na dole:
-
--dodawanie kanalow sie wyswietla 2 razy i tam jest problem z pointerami
-
--jak odpale filmik z historii jeszcze raz to powinien przeskakiwac na gore
-
 -odtwarzanie playlist w ogole nie dziala bo odpala sie tylko pierwszy filmik wiec w sumie moznaby to jakos naprawic w sensie zrobic kolejny model dla odpalania filmikow z playlist
 w teorii jakbym w koncu naprawil to wyswietlanie sie filmikow 2 razy w mpv to w ogole caly problem historii by zniknal
 
--dodac zeby jak jest isgb to mozna bylo uzywac potem historii i searcha
+Naprawic wszystkie bugi, lista na dole:
 
--dodac pointery do wszystkich innych modeli ktore wyswietlaja sie wiecej niz raz
+-dodawanie kanalow sie wyswietla 2 razy i tam jest problem z pointerami (nie wiadomo czy to jest problem z pointerami ale raczej nie bo jak to naprawilem to dalej jest to samo)
 
--z go back to videos list sie robi ten sam problem co w przypadku isgb z normalnym listowaniem tego
+-wychodzenie z searcha sie psuje tez btw
 
--also play previous video tez nie dziala z jakiegos powodu
+-dobra widze ze znowu jest jakis problem z tym ze jak wyjde z historii to sie nie wyswietlaja filmiki
+
+
+also z dobrych informacji to wydaje sie ze te wszystkie poprzednie rzeczy dzialaja w miare sprawnie juz i to przeskakiwanie na gore w historii juz chyba dziala
 

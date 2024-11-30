@@ -63,7 +63,7 @@ type modelsix struct {
 	cursorMode cursor.Mode
 }
 
-func initialModel3() modelsix {
+func initialModel3() *modelsix {
 	m := modelsix{
 		inputs: make([]textinput.Model, 2),
 	}
@@ -89,14 +89,14 @@ func initialModel3() modelsix {
 		m.inputs[i] = t
 	}
 
-	return m
+	return &m
 }
 
-func (m modelsix) Init() tea.Cmd {
+func (m *modelsix) Init() tea.Cmd {
 	return textinput.Blink
 }
 
-func (m modelsix) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *modelsix) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -168,7 +168,7 @@ func (m *modelsix) updateInputs(msg tea.Msg) tea.Cmd {
 
 // tu jak jest pointer reciever to sie cos psuje tez jak cos
 
-func (m modelsix) View() string {
+func (m *modelsix) View() string {
 	var b strings.Builder
 
 	for i := range m.inputs {
@@ -196,37 +196,56 @@ type (
 	errMsg error
 )
 
+// tu sie zaczyna modelfour jak cos
+
 type modelfour struct {
 	textInput textinput.Model
 	err       error
 }
 
-func initialModel() modelfour {
+func initialModel() *modelfour {
 	ti := textinput.New()
+	// czyli widze ze w przyp
 	ti.Placeholder = "Linux"
 	ti.Focus()
 	ti.CharLimit = 156
 	ti.Width = 20
 
-	return modelfour{
+	return &modelfour{
 		textInput: ti,
 		err:       nil,
 	}
 }
 
-func (m modelfour) Init() tea.Cmd {
+func (m *modelfour) Init() tea.Cmd {
 	return textinput.Blink
 }
 
 // czyli tutaj tez trzeba pokombinowac z pointerami zeby to wyswietlanie searcha 2 razy sie naprawilo i dodawania ale to jest troche inaczej skonstruowane niz tamte poprzednie z listami
 // tez widze ze przez to ze tutaj jest initialmodel i przez niego to jest wywolywane
-func (m modelfour) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *modelfour) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.Type {
-		case tea.KeyEnter, tea.KeyCtrlC, tea.KeyEsc:
+
+		// tutaj jest to do wychodzenia jak cos
+
+		case tea.KeyCtrlC:
+
+			// zrobienie tutaj tego tak samo jak w tamtych innych z isgb true nie dziala jak cos pewnie przez strukture tego modelu ze inna
+
+			isgb = true
+			//dalej nie dziala ale tutaj to wyglada jakby w ogole tego nie wykrywalo z jakiegos powodu
+			// trzeba zrobic cos takiego zeby tutaj sie wracalo albo zeby w jakis sposob wywalalo caly program jak to dam
+
+			// ciekawe bo teraz dziala ale jest ten sam problem z wywalaniem calego terminala co wczesniej
+
+			// os.Exit teoretycznie to mozna zrobic ale wtedy jest ten blad z wywalaniem sie terminala calego
+			// w sumie jak nic nie dziala to mozna wykombinowac po prostu tak zeby sie wracalo kilkukrotnie to nie dziala przynajmniej jak daje tea.Quit kilka razy tutaj na gorze
+			return m, tea.Quit
+		case tea.KeyEnter, tea.KeyEsc:
 			return m, tea.Quit
 		}
 
@@ -239,7 +258,7 @@ func (m modelfour) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m modelfour) View() string {
+func (m *modelfour) View() string {
 	text = m.textInput.Value()
 	return fmt.Sprintf(
 		"Search:\n\n%s\n\n%s",
@@ -266,11 +285,11 @@ func initialModel2() modelfive {
 	}
 }
 
-func (m modelfive) Init() tea.Cmd {
+func (m *modelfive) Init() tea.Cmd {
 	return textinput.Blink
 }
 
-func (m modelfive) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *modelfive) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
@@ -289,7 +308,7 @@ func (m modelfive) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m modelfive) View() string {
+func (m *modelfive) View() string {
 
 	text2 = m.textInput.Value()
 	return fmt.Sprintf(
@@ -329,6 +348,7 @@ func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 
 	fn := itemStyle.Render
 	if index == m.Index() {
+
 		fn = func(s ...string) string {
 			return selectedItemStyle.Render("> " + strings.Join(s, " "))
 		}
@@ -408,9 +428,12 @@ func (m *modeltwo) View() string {
 	m.choice = ""
 
 	// to jest do zapisywania historii
+
+	// dobra czyli tutaj zamysl jest taki zeby przed tym jak to doda do historii to przeskanowac to cale i wywalic wszystkie duplikaty i wtedy powinno dzialac
 	for key, value := range videos {
 		if value == link {
 			combinated := fmt.Sprintf("%s [Line break here] %s\n", key, link)
+			historyCleanup(combinated)
 			file, err := os.OpenFile(filePath, os.O_APPEND|os.O_WRONLY, 0644)
 			if err != nil {
 				panic(err)
@@ -458,8 +481,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch keypress := msg.String(); keypress {
-		case "q", "ctrl+c":
+		case "q":
+
 			//m.quitting = true
+			return m, tea.Quit
+		case "ctrl+c":
 			return m, tea.Quit
 
 		case "enter":
@@ -525,6 +551,8 @@ func (m model) View() string {
 		// teraz z tym znowu jest jakis problem ze jak wejde w jakis kanal a potem z niego do searcha to sie wyswietlaja filmiki z niego co juz kiedys chyba bylo naprawiane tylko nie pamietam w jaki sposob
 		// no widze ze w tej nowej wersji tez jest ten problem nie wiem w ogole jak to sie stalo ze wszystkie bugfixy poprzednie nagle jakos zniknely
 
+		// gwiazdka to jest pointer reciever btw
+		// dobra ale widze ze przy szukaniu te pointery nic w ogole nie daja
 		p := tea.NewProgram(initialModel())
 		if _, err := p.Run(); err != nil {
 			log.Fatal(err)
@@ -537,6 +565,9 @@ func (m model) View() string {
 	}
 
 	if m.choice == "History" {
+
+		// tutaj tez teoretycznie os.Exit powinno rozwiazac sprawe ale bedzie ten sam problem co z innymi rzeczami
+
 		isgb = false
 		rmDuplicates()
 		isHistory = true
@@ -644,6 +675,8 @@ func (m *modelthree) View() string {
 		// START to cale jest w ogole do zignorowania bo tylko przypisuje rzeczy do historii
 
 		for key, value := range videos {
+
+			// dobra czyli tutaj zamysl jest taki zeby przed tym jak to doda do historii to przeskanowac to cale i wywalic wszystkie duplikaty i wtedy powinno dzialac
 			if value == link {
 				combinated := fmt.Sprintf("%s [Line break here] %s\n", key, link)
 				file, err := os.OpenFile("history", os.O_APPEND|os.O_WRONLY, 0644)
