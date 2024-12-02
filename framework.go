@@ -23,6 +23,7 @@ import (
 )
 
 // generalnie z tym przeskakiwaniem rzeczy na gorze w historii mozna zrobic cos takiego ze on za kazdym razem bedzie przy dodawaniu czegos skanowal cale output.txt czy jest tam cos o takiej samej nazwie i to
+// jak chce cos innego robic akurat to git bo to remove a channel nie kloci sie z innymi czesciami kodu za bardzo generalnie
 
 var link string
 var text string
@@ -465,6 +466,87 @@ func (m *modeltwo) View() string {
 
 }
 
+// START test mowy model do usuwania kanalow
+
+type modelrm struct {
+	list     list.Model
+	choice   string
+	quitting bool
+}
+
+func (m modelrm) Init() tea.Cmd {
+	return nil
+}
+
+func (m modelrm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.list.SetWidth(msg.Width)
+		return m, nil
+
+	case tea.KeyMsg:
+		switch keypress := msg.String(); keypress {
+		case "q":
+
+			isQuittin = true
+
+			//m.quitting = true
+			//return m, tea.Quit
+		case "ctrl+c":
+			return m, tea.Quit
+
+		case "enter":
+			i, ok := m.list.SelectedItem().(item)
+			if ok {
+				m.choice = string(i)
+			}
+			return m, tea.Quit
+		}
+	}
+
+	var cmd tea.Cmd
+	m.list, cmd = m.list.Update(msg)
+	return m, cmd
+}
+
+func (m modelrm) View() string {
+	var ok bool
+
+	// tutaj koniec tych wszystkich rzeczy ktore sa do wywalenia
+
+	channelToRemove := m.choice
+
+	fmt.Sprintf("diawejhdfioasdfjaowidfjao %s", channelToRemove)
+
+	file, _ := os.Open("channels.md")
+
+	defer file.Close()
+
+	// Read the file line by line
+	scanner := bufio.NewScanner(file)
+	var lines []string
+	for scanner.Scan() {
+		line := scanner.Text()
+		// Check if the line does not match the variable
+		if line != channelToRemove {
+			lines = append(lines, line)
+		}
+	}
+
+	// Check for any errors
+
+	if ok {
+		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
+	}
+	if m.quitting {
+		return quitTextStyle.Render("Don't want to watch? That’s cool.")
+	}
+	return "\n" + m.list.View()
+
+}
+
+// KONIEC test nowy model do usuwania kanalow
+
 type model struct {
 	list     list.Model
 	choice   string
@@ -510,11 +592,14 @@ func (m model) View() string {
 	var ok bool
 
 	if m.choice == "Add a channel" {
+
 		testowanko()
 		// z tym w ogole jest taki problem ze z tego co patrzylem po errorze to jak klikam w model add a channel to on z jakiegos powodu zaczyna od razu parsowanie zamiast wyswietlic ten model
 
 		// czyli wychodzi na to ze to sie z jakiegos powodu nie odpala
 		// podejrzewam ze problem jest w mainie a nie tutaj bo tutaj to nic nie zmienialem od dawna i sie dopiero po zrobieniu tego isgb zaczelo robic
+
+		// tutaj mi executuje ten pierwszy model
 		if _, err := tea.NewProgram(initialModel3()).Run(); err != nil {
 			fmt.Printf("could not start program: %s\n", err)
 			os.Exit(1)
@@ -545,6 +630,45 @@ func (m model) View() string {
 		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
 	}
 
+	// START test usuwanie kanalow
+
+	if m.choice == "Remove a channel" {
+
+		//fmt.Println(items)
+
+		// dobra czyli sam zamysl na usuwanie kanalow z tej listy jest taki ze chce wywolac liste jak w pierwszej tylko ten kanal co jest wybrany usunac z channels.md chyba
+		// also generalnie to mysle ze do usuwania kanalow mozna sprobowac zrobic osobny model ktory bedzie dzialal jak model zwykly tylko bez tych wszystkich rzeczy z opcjami a z samymi kanalami
+
+		const defaultWidth = 20
+
+		l := list.New(items, itemDelegate{}, defaultWidth, listHeight)
+		l.Title = "Select the channel you'd like to watch"
+		l.SetShowStatusBar(false)
+		l.SetFilteringEnabled(false)
+		l.Styles.Title = titleStyle
+		l.Styles.PaginationStyle = paginationStyle
+		l.Styles.HelpStyle = helpStyle
+
+		// tutaj to widze ze znowu jest ten sam problem co juz milion razy byl
+
+		// ciekawe w sumie bo widze ze tutaj moge se zmienic m na inna nazwe i normalnie dziala bez tego errora
+
+		// jest niby opcja ze to jest problem z wywolywaniem modelu w innym modelu ale z drugiej strony to jest normalnie ten sam problem co juz kiedys byl wiec pewnie nie
+		// teraz jest kolejny problem z tym ze ta lista jest pusta ale to nie wiem czy bardziej wina tego co zrobilem w sensie przypisaniu m jako nowa lokalna zmienna czy tego ze nic nie zrobilem z dodawaniem tej listy
+		// items to jest niby globalna zmienna ale jak ja na gorze printuje to jest pusta
+
+		m := modelrm{list: l}
+
+		// ten problem tutaj jest najprawdopodobniej przez to ze w pliku history sie robi jakis whitespace nie wiem czemu
+		if _, err := tea.NewProgram(m).Run(); err != nil {
+			fmt.Println("Error running program:", err)
+			os.Exit(1)
+		}
+		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
+	}
+
+	// KONIEC test usuwanie kanalow
+
 	if m.choice == "Search" {
 		isgb = false
 		isHistory = false
@@ -569,7 +693,7 @@ func (m model) View() string {
 
 		encodedText := url.QueryEscape(text)
 		link = "https://inv.nadeko.net/search?q=" + encodedText
-		fmt.Println(link)
+		//fmt.Println(link)
 		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
 	}
 
@@ -611,7 +735,7 @@ func (m model) View() string {
 		//itemkihist = itemkihist[:len(itemkihist)-1]
 
 		countLines()
-		fmt.Println(linecounter)
+		//fmt.Println(linecounter)
 		itemkihist = itemkihist[:linecounter]
 
 		for i := range itemkihist {
@@ -681,6 +805,11 @@ func (m *modelthree) View() string {
 
 	if m.choice == "Play next video" {
 
+		// dobra czyli teraz to teoretycznie dziala ale jest problem z listami ze sie te same filmiki pokazuja
+
+		//02.12.2024
+
+		//testowanie = m.choice
 		// generalnie w tym calym to problem jest taki ze wartosc m.choice czyli tym samym globaltest jest pusta bo cos tam sie psuje na gorze przy view tej funkcji
 
 		// START to cale jest w ogole do zignorowania bo tylko przypisuje rzeczy do historii
@@ -722,17 +851,18 @@ func (m *modelthree) View() string {
 			}
 		}
 
-		fmt.Println(index)
+		//fmt.Println(index)
 		// w tym momencie index jest 0 czyli tak jak powinno byc a po dodaniu jest 1 czyli tez teoretycznie dobrze
 		// a jak juz dam filmik 6 to tez jest 0 i 1 z jakiegos powodu
 		index = index + 1
 
 		// zawsze jest na 0 i 1 i z tego co widze to teraz np sie w ogole pokazal ten sam filmik
-		fmt.Println(index)
+		//fmt.Println(index)
 		m.choice = itemki[index]
 		link = videos[m.choice]
 		testt := exec.Command("mpv", link)
 		testt.Run()
+
 		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
 	}
 
@@ -767,11 +897,11 @@ func (m *modelthree) View() string {
 			// dobra widze czyli tu jest ten problem co u gory ze jest zawsze 0 i 1 jak printuje to z jakiegos powodu
 			return quitTextStyle.Render(fmt.Sprintf("%s? I can't see any previous video.", m.choice))
 		}
-		fmt.Println(index)
+		//fmt.Println(index)
 		// w tym momencie index jest 0 czyli tak jak powinno byc a po dodaniu jest 1 czyli tez teoretycznie dobrze
 		// a jak juz dam filmik 6 to tez jest 0 i 1 z jakiegos powodu
 		index = index - 1
-		fmt.Println(index)
+		//fmt.Println(index)
 		m.choice = itemki[index]
 		link = videos[m.choice]
 		testt := exec.Command("mpv", link)

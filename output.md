@@ -13,3 +13,5 @@ Techlore    https://inv.nadeko.net/channel/UCs6KfncB4OV6Vug4o_bzijg
 MrBeast    https://inv.nadeko.net/channel/UCX6OQ3DkcsbYNE6H8uQQuVA
 MrBeast    https://inv.nadeko.net/channel/UCX6OQ3DkcsbYNE6H8uQQuVA
 Techquickie    https://inv.nadeko.net/channel/UC0vBXGSyV14uvJ4hECDOl0Q
+Techquickie    https://inv.nadeko.net/channel/UC0vBXGSyV14uvJ4hECDOl0Q
+test    https://inv.nadeko.net/channel/UCf4iKXL_SJQ5d0qsKkboRRQ

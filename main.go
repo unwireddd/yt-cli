@@ -2,6 +2,8 @@ package main
 
 // dobra czyli generalnie widze ze juz wszystko podstawowe co powinno dziala w kwestii historii i szukania wiec mozna wrocic na jakis czas do naprawiania bugow z poruszaniem sie po programie
 
+// dobra czyli na najblizsze dni to w sumie wyjebac te niepotrzebne printy, sprobowac tego buga z dodawaniem chyba albo go back zrobic, popracowac nad zapetlaniem sie tego wszystkiego i moze sprobowac pokombinowac z usuwaniem kanalow
+
 import (
 	"fmt"
 	"maps"
@@ -25,6 +27,7 @@ var howgb = 0
 var sprawdzanieczegos int
 var mapConvert []string
 var isQuittin bool
+var items []list.Item
 
 func removeFirstAlphanumeric(s string) string {
 	re := regexp.MustCompile(`^[a-zA-Z0-9_\-]+`)
@@ -42,11 +45,12 @@ x2:
 	// bo teraz zeby naprawic wiekszosc problemow z tym to powinno jakos na poczatku sie to robic na false zeby za kazdym razem tak tego nie bral
 	//isgb = false
 
+	// to sie moze przydac przy usuwaniu kanalow tylko na odwrot zrobione jak cos
 	for key, value := range channelstwo {
 		newKey := strings.Replace(key, "_", " ", -1)
 		updatedMap[newKey] = value
 	}
-	fmt.Println(updatedMap)
+	//fmt.Println(updatedMap)
 	//renamer()
 	convertList()
 	for key, value := range updatedMap {
@@ -55,7 +59,7 @@ x2:
 	//fmt.Println(channels)
 	screen.Clear()
 	var m tea.Model
-	var items []list.Item
+	//var items []list.Item
 	itemsthree := []list.Item{
 		item("Play next video"),
 		item("Play previous video"),
@@ -81,6 +85,7 @@ x2:
 	items = append(items, item("Search"))
 	items = append(items, item("History"))
 	items = append(items, item("Add a channel"))
+	items = append(items, item("Remove a channel"))
 
 	const defaultWidth = 20
 
@@ -230,7 +235,7 @@ x2:
 			// tutaj jak cos jest rozwiazanie do tego w nowszej wersji tylko trzeba teraz to wszystko poprzenosic
 			// dobra chyba jednak nie ma bo jak teraz odpalam nowa wersje to tez sie robi out of range po jakims czasie
 			// w sumie to moze byc problem z tymi pointerami wiec notatka na jutro zeby sprawdzic czy dalej sie bedzie robic jak je wywale nie to nie przez to
-			fmt.Println(len(sprawdzam))
+			//fmt.Println(len(sprawdzam))
 			itemsgb = itemsgb[:0]
 			// btw na gore kodu nawet nie ma co patrzec w tym przypadku bo tam nie ma nic z isgb poza zadeklarowaniem howgb na zero i sprawdzam jako listy
 			// to na gorze jest do wywalania tych filmikow z poprzednich list
@@ -344,7 +349,7 @@ x2:
 					// trzeba sprobowac zrobic dla searcha nowa liste chyba
 					if howgb > 0 {
 						//itemstwo = itemstwo[sprawdzanieczegos:]
-						fmt.Println(itemstwo)
+						//fmt.Println(itemstwo)
 						//itemstwo = itemstwo[:len(mecze)]
 					}
 
@@ -358,7 +363,7 @@ x2:
 
 				//itemstwo = itemstwo[:sprawdzanieczegos]
 				//fmt.Println(itemstwo)
-				fmt.Println(len(itemstwo))
+				//fmt.Println(len(itemstwo))
 				l = list.New(itemstwo, itemDelegate{}, defaultWidth, listHeight)
 				l.Title = "Select the video you'd like to watch"
 				l.SetShowStatusBar(false)
@@ -414,6 +419,9 @@ x2:
 		}
 		if testowanie == "Go back to videos list" {
 			goto x
+		}
+		if testowanie == "Play next video" {
+			goto x2
 		}
 		os.Remove("output.txt")
 	}
