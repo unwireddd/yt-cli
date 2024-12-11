@@ -1,5 +1,8 @@
 // jutro te pointery z maila ogarnac
 
+// JUTRO PIERWSZE CO ZROBIC TO OGARNAC COMMITOWANIE NA GH
+// generalnie usuwanie kanalow wyglada na naprawione wiec teraz kolejnym priorytetem jest zrobienie wiekszej liczby filmikow ktore beda sie ladowac
+
 package main
 
 import (
@@ -44,6 +47,9 @@ var isgb bool
 var lenHistory int
 var linecounter int
 var testowaniedrugiejrzeczy string
+var isReplaying bool
+var linkForReplays string
+var globalRmTest string
 
 var (
 	focusedStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
@@ -452,6 +458,8 @@ func (m *modeltwo) View() string {
 
 	if ok {
 
+		linkForReplays = link
+
 		testt := exec.Command("mpv", link)
 		testt.Run()
 		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
@@ -499,6 +507,7 @@ func (m modelrm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			i, ok := m.list.SelectedItem().(item)
 			if ok {
 				m.choice = string(i)
+				globalRmTest = m.choice
 			}
 			return m, tea.Quit
 		}
@@ -512,26 +521,24 @@ func (m modelrm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m modelrm) View() string {
 	var ok bool
 
+	//fmt.Println(channelstwo["qwert"])
+	// czyli wychodzi na to ze ten link w channelstwo w sensie mapce tutaj sie normalnie zgadza a usuwane dziala wiec to raczej jest problem z samym skryptem
+	// also mozna chyba zwyczajnie usunac tez link wywolujac to drugi raz
+
+	// dobra czyli tutaj pierwszy problem jest taki ze m.choice w calym modelu jest puste a drugi te cala konstrukcja tego modelu jest jakas dziwna i mysle ze cos tu sie nie zgadza
+
 	// tutaj koniec tych wszystkich rzeczy ktore sa do wywalenia
 
-	channelToRemove := m.choice
+	// dobra ogolnie wychodzi na to ze zeby to dzialalo to po pierwsze potrzebne jest to zeby to m.choice gdzies zapisywac a po drugie zeby poza nazwa usuwalo tez link
 
-	fmt.Sprintf("diawejhdfioasdfjaowidfjao %s", channelToRemove)
+	//channelToRemove := fmt.Sprintln("%s    %s", "qwert", channelstwo["qwert"])
 
-	file, _ := os.Open("channels.md")
+	//fmt.Println(channelToRemove)
 
-	defer file.Close()
+	// oo dobra czyli teraz juz normalnie to dziala
 
-	// Read the file line by line
-	scanner := bufio.NewScanner(file)
-	var lines []string
-	for scanner.Scan() {
-		line := scanner.Text()
-		// Check if the line does not match the variable
-		if line != channelToRemove {
-			lines = append(lines, line)
-		}
-	}
+	channelRemove(globalRmTest)
+	channelRemove(channelstwo[globalRmTest])
 
 	// Check for any errors
 
@@ -634,6 +641,8 @@ func (m model) View() string {
 
 	if m.choice == "Remove a channel" {
 
+		// na obecna chwile to nie dziala w sensie nie usuwa nic
+
 		//fmt.Println(items)
 
 		// dobra czyli sam zamysl na usuwanie kanalow z tej listy jest taki ze chce wywolac liste jak w pierwszej tylko ten kanal co jest wybrany usunac z channels.md chyba
@@ -642,7 +651,7 @@ func (m model) View() string {
 		const defaultWidth = 20
 
 		l := list.New(items, itemDelegate{}, defaultWidth, listHeight)
-		l.Title = "Select the channel you'd like to watch"
+		l.Title = "Select the channel you'd like to remove"
 		l.SetShowStatusBar(false)
 		l.SetFilteringEnabled(false)
 		l.Styles.Title = titleStyle
@@ -803,13 +812,19 @@ func (m *modelthree) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *modelthree) View() string {
 
+	isReplaying = false
+
 	if m.choice == "Play next video" {
 
 		// dobra czyli teraz to teoretycznie dziala ale jest problem z listami ze sie te same filmiki pokazuja
 
 		//02.12.2024
-
-		//testowanie = m.choice
+		// ciekawe bo jak sie wracam to sie zwieksza liczba kanalow w pierwszej liscie
+		// ale nvm bo to dziala generalnie
+		// zeby to naprawic to trzeba wywalic to appendowanie w kolko jak cos
+		isgb = true
+		howgb += 60
+		testowanie = m.choice
 		// generalnie w tym calym to problem jest taki ze wartosc m.choice czyli tym samym globaltest jest pusta bo cos tam sie psuje na gorze przy view tej funkcji
 
 		// START to cale jest w ogole do zignorowania bo tylko przypisuje rzeczy do historii
@@ -868,6 +883,9 @@ func (m *modelthree) View() string {
 
 	if m.choice == "Play previous video" {
 		// START historia do zignorowania
+		isgb = true
+		testowanie = m.choice
+
 		for key, value := range videos {
 			if value == link {
 				combinated := fmt.Sprintf("%s [Line break here] %s\n", key, link)
@@ -912,6 +930,14 @@ func (m *modelthree) View() string {
 	if m.choice == "Go back to videos list" {
 		// ciekawe w sumie bo przy go back to sie w ogole gdzies zapetla i caly czas jest
 		// jak bede ogarniac zapetlanie tego to mozna popatrzec na to potem
+		testowanie = m.choice
+		return "ok"
+	}
+
+	if m.choice == "Replay video" {
+		// ciekawe w sumie bo przy go back to sie w ogole gdzies zapetla i caly czas jest
+		// jak bede ogarniac zapetlanie tego to mozna popatrzec na to potem
+		isReplaying = true
 		testowanie = m.choice
 		return "ok"
 	}

@@ -6,5 +6,7 @@ Naprawic wszystkie bugi, lista na dole:
 
 -dodawanie kanalow sie wyswietla 2 razy i tam jest problem z pointerami (nie wiadomo czy to jest problem z pointerami ale raczej nie bo jak to naprawilem to dalej jest to samo)
 
+-also warto dodac funkcje replay (juz dziala tylko chyba jest jakis bug z tym wiec trzeba sprawdzic)
+
 also z dobrych informacji to wydaje sie ze te wszystkie poprzednie rzeczy dzialaja w miare sprawnie juz i to przeskakiwanie na gore w historii juz chyba dziala
 

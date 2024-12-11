@@ -4,10 +4,12 @@ package main
 
 // dobra czyli na najblizsze dni to w sumie wyjebac te niepotrzebne printy, sprobowac tego buga z dodawaniem chyba albo go back zrobic, popracowac nad zapetlaniem sie tego wszystkiego i moze sprobowac pokombinowac z usuwaniem kanalow
 
+// dobra czyli moim zdaniem zeby zrobic funkcje replay to trzeba tutaj w mainie zrobic goto statementa ktory bedzie zaraz przed odpaleniem sie filmiku z listy i na tej podstawie to zapetlac
 import (
 	"fmt"
 	"maps"
 	"os"
+	"os/exec"
 	"regexp"
 	"strings"
 
@@ -28,6 +30,8 @@ var sprawdzanieczegos int
 var mapConvert []string
 var isQuittin bool
 var items []list.Item
+var isAppending int
+var checksForGoingBack bool
 
 func removeFirstAlphanumeric(s string) string {
 	re := regexp.MustCompile(`^[a-zA-Z0-9_\-]+`)
@@ -38,54 +42,63 @@ func main() {
 
 	// notatka ze nastawienie na poczatku isgb na false nie dziala ale chyba trzeba cos wlasnie probowac w ta strone
 	howgb = 0
+	isAppending = 0
 
 x2:
 	isHistory = false
+
+	// dobra w sumie mozna tez po prostu przeniesc goto statement po dodawaniu kanalow bo na dole sie i tak tylko appenduja rzeczy do pierwszej listy
+
 	// dobra czyli jak tutaj nastawie se isgb na false to sie wszystko w ogole psuje i jest tak jak przed zaimplementowaniem tego
 	// bo teraz zeby naprawic wiekszosc problemow z tym to powinno jakos na poczatku sie to robic na false zeby za kazdym razem tak tego nie bral
 	//isgb = false
 
 	// to sie moze przydac przy usuwaniu kanalow tylko na odwrot zrobione jak cos
-	for key, value := range channelstwo {
-		newKey := strings.Replace(key, "_", " ", -1)
-		updatedMap[newKey] = value
-	}
-	//fmt.Println(updatedMap)
-	//renamer()
-	convertList()
-	for key, value := range updatedMap {
-		channels[key] = value
-	}
-	//fmt.Println(channels)
-	screen.Clear()
+
+	// START pierwsze appendowanie
+
+	// czyli generalnie tutaj trzeba dac najlepiej jakas zmienna tak zeby jak sie bedzie zgadzalo w sensie po pierwszym to nie appendowal juz
+	// dobra czyli widze ze tutaj jest taki problem ze deklaruje sie zmienne i rzeczy w tym ifstatemencie ktore sa uzywane potem jak m i potem jak juz jest wieksze to by sie nie pokazywalo nic chyba
+
+	// dobra czyli widze ze to generalnie chyba dziala tak jak powinno
+
 	var m tea.Model
-	//var items []list.Item
 	itemsthree := []list.Item{
+		item("Replay video"),
 		item("Play next video"),
 		item("Play previous video"),
 		item("Go back to videos list"),
 	}
 	var mecze []string
 
-	// tutaj sprobuje ta mapke zmienic na tablice zeby te kanaly tak nie przeskakiwaly w kolejnosci co chwila
+	if isAppending == 0 {
+		for key, value := range channelstwo {
+			newKey := strings.Replace(key, "_", " ", -1)
+			updatedMap[newKey] = value
+		}
+		convertList()
+		for key, value := range updatedMap {
+			channels[key] = value
+		}
 
-	/*for t := range maps.Keys(channels) {
-		fmt.Println(t)
-		mapConvert = append(mapConvert, t)
-	}*/
+		screen.Clear()
 
-	// dobra czyli to nie zadziala dlatego ze po pierwsze w tablicy sa same klucze i nie ma wartosci ich
-	// also zeby to faktycznie zadzialalo to mozna po prostu sprobowac przerobic i wartosci i klucze na mapke a potem to jakos laczyc ze soba
-	// i ogolnie to zeby to zawsze mialo ta sama kolejnosc to ta mapka powinna byc posortowana a w go sie tak nie da
+		// test przenoszenie
 
-	for t := range maps.Keys(channels) {
-		items = append(items, item(t))
+		for t := range maps.Keys(channels) {
+			items = append(items, item(t))
+		}
+
+		items = append(items, item("Search"))
+		items = append(items, item("History"))
+		items = append(items, item("Add a channel"))
+		items = append(items, item("Remove a channel"))
+
+		isAppending++
+
 	}
 
-	items = append(items, item("Search"))
-	items = append(items, item("History"))
-	items = append(items, item("Add a channel"))
-	items = append(items, item("Remove a channel"))
+	// KONIEC pierwsze appendowanie
 
 	const defaultWidth = 20
 
@@ -381,11 +394,33 @@ x2:
 			}
 		}
 
+		// tutaj zaraz na gorze sie odpala filmik wiec widze ze tutaj wlasnie trzeba to do replay zrobic
+
+	x3:
+		if isReplaying == true {
+
+			// dobra czyli os.Exit wykrywa normalnie jak cos
+			//os.Exit(0)
+
+			// dobra czyli widze ze dziala normalnie ten replay tylko jest taki problem ze ten link sie nie zapisuje z jakiegos powodu
+
+			// teraz wyglada na to ze replay dziala normalnie
+			testt := exec.Command("mpv", linkForReplays)
+			testt.Run()
+
+			// dobra czyli widze ze teraz w miare to dziala ale problem jest taki ze to sie zapetla w kolko po prostu
+
+			// widze ze go back to videos list jak cos wybiore to sie tez zapetla ale trzeba chyba gdzies po prostu na poczatku ustawic isReplaying na false
+		}
+
+		// czyli generalnie widze ze zeby zrobic dzialajace replay to trzeba jakos wykombinowac zeby tutaj po tym goto wywolywalo mpv jesli faktycznie jest klikniete replay
+
 		// sprobuje jutro wyklikac ze wiecej filmikow bo moze one dlatego sie zapetlaja
 		/*
 			dobra czyli ogolnie kolejnosc jest zalatwiona tylko teraz trzeba ogarnac to zapetlanie i cala funkcja historii bedzie zrobiona
 		*/
 
+		// tym na dole sie nie trzeba za bardzo przejmowac bo to tylko dla q i wychodzenia itp
 		if isgb {
 			// czyli ze jesli isgb jest nastawione na tak co sie robi zawsze jak kilkne q zeby zmienic kanal to ten kod na dole sie w ogole nie bedzie executowal przez goto statement
 			// moze to isgb trzeba przeniesc jakos do srodka funkcji zeby to nie byla globalna zmienna to wtedy cos sie uda
@@ -418,10 +453,19 @@ x2:
 			os.Exit(1)
 		}
 		if testowanie == "Go back to videos list" {
+			isgb = true
+			// ogolnie troche dziwne to jest bo teoretycznie jak sie wraca do x to powinno to ucinac tez normalnie bo to taki sam kod jak przy pierwszym odpaleniu i skakaniu miedzy kanalami
+			// dobra czyli teraz tutaj wszystko normalnie dziala wystarczylo dac isgb na true
+			checksForGoingBack = true
+
+			// tutaj jest taki problem ze sie nie usuwaja te filmiki z listy i jest takie cos jak kiedys mialem tez przy wracaniu sie
 			goto x
 		}
 		if testowanie == "Play next video" {
 			goto x2
+		}
+		if testowanie == "Replay video" {
+			goto x3
 		}
 		os.Remove("output.txt")
 	}
