@@ -1,10 +1,13 @@
 package main
 
-// dobra czyli generalnie widze ze juz wszystko podstawowe co powinno dziala w kwestii historii i szukania wiec mozna wrocic na jakis czas do naprawiania bugow z poruszaniem sie po programie
+// dobra w takim razie nastepny cel na najblizsze dni to zrobic zeby wiecej filmikow sie ladowalo z kanalu zamiast tylko pierwsze 60 i wyczyscic te wszystkie niepotrzebne komentarze po polsku
 
-// dobra czyli na najblizsze dni to w sumie wyjebac te niepotrzebne printy, sprobowac tego buga z dodawaniem chyba albo go back zrobic, popracowac nad zapetlaniem sie tego wszystkiego i moze sprobowac pokombinowac z usuwaniem kanalow
+// to dlugie ladowanie filmikow jest najprawdopodobniej spowodowane tym ze youtube spowalnie a nie samym kodem
 
-// dobra czyli moim zdaniem zeby zrobic funkcje replay to trzeba tutaj w mainie zrobic goto statementa ktory bedzie zaraz przed odpaleniem sie filmiku z listy i na tej podstawie to zapetlac
+// czyli generalnie problem z dodawaniem wiekszej ilosci kanalow jest taki ze po continuation jest jakis dziwny ciag znakow ktory przy kazdym kanale sie zmienia
+// dobra czyli moim zdaniem zeby ladowac wiecej filmikow to po linku trzeba sobie wyciagnac z htmla ten link do nastepnej strony po prostu i zrobic to 2 razy
+// btw warto zapamietac ze nie wszystkie kanaly maja wiecej niz 60 filmikow wiec w niektorych nie bedzie w ogole czegos takiego
+
 import (
 	"fmt"
 	"maps"
@@ -124,6 +127,7 @@ x2:
 
 		// tutaj trzeba zrobic if statement ze jak isHistory jest na false to sie robi to a jak nie to inaczej
 		if !isHistory {
+
 			ator, _ := soup.Get(link)
 			atorvid := soup.HTMLParse(ator)
 			// tutaj zeby to segmentation naprawic to trzeba jakis if statement na dole zrobic ze jak nie dziala to wychodzi normalnie
@@ -132,6 +136,8 @@ x2:
 			owtput := atorvid.Find("div", "class", "pure-g").HTML()
 			re := regexp.MustCompile(`<a[^>]*>.*?<p dir="auto">.*?</p>.*?</a>`)
 			matches := re.FindAllString(owtput, -1)
+
+			// tu sie zaczyna ta pierwsza petla do dodawania pierwszych 60 filmikow
 			for _, match := range matches {
 
 				// usuwanie elementow htmla
@@ -209,6 +215,76 @@ x2:
 				video = video + 1
 
 			}
+			// tu sie konczy ta pierwsza petla do dodawania pierwszych 60 filmikow
+			if len(mecze) == 60 {
+
+				dlugosc := 60
+
+				// dobra czyli teraz dziala w sensie wyswietla sie pierwsze 120 a nie tylko 60 i podejrzewam ze mozna to dac po prostu w jakiejs petli
+
+				// zmienna atorvid to moj sparsowany html jak cos
+
+				// czyli generalnie teraz wyswietla pierwsze 300 filmikow zamiast 60 ale wolno sie laduje wiec pewnie trzeba zrobic cos w stylu opcji next page ze wtedy dopiero laduje kolejne
+
+				for len(mecze) == dlugosc && len(mecze) < 300 {
+
+					filmikidwa := atorvid.Find("div", "class", "page-next-container")
+
+					kont := filmikidwa.Find("a")
+					kont2 := kont.Attrs()
+					sprawdzanie := kont2["href"]
+
+					link = fmt.Sprint("https://inv.nadeko.net", sprawdzanie)
+					//fmt.Println(link)
+					ator, _ = soup.Get(link)
+					atorvid = soup.HTMLParse(ator)
+					//fmt.Println(atorvid)
+					owtput := atorvid.Find("div", "class", "pure-g").HTML()
+					re := regexp.MustCompile(`<a[^>]*>.*?<p dir="auto">.*?</p>.*?</a>`)
+					matches := re.FindAllString(owtput, -1)
+
+					// tu sie zaczyna ta pierwsza petla do dodawania pierwszych 60 filmikow
+					for _, match := range matches {
+
+						// usuwanie elementow htmla
+						match = strings.Replace(match, "<a href=", "", -1)
+						if video < 10 {
+							match = strings.Replace(match, `><p dir="auto">`, "			", -1)
+						} else {
+							match = strings.Replace(match, `><p dir="auto">`, "       ", -1)
+						}
+						match = strings.Replace(match, `</p></a>`, "", -1)
+						match = strings.Replace(match, `"`, "", -1)
+						match = strings.Replace(match, `/`, fmt.Sprintf("https://www.youtube.com/"), -1)
+						cutter := regexp.MustCompile(`https?://[^\s]+`)
+						link := cutter.FindString(match)
+						match = strings.Replace(match, `https://www.youtube.com/`, fmt.Sprintf(""), -1)
+						match = strings.Replace(match, "watch?v=", "", 1)
+
+						testlista := regexp.MustCompile(`\?list=.*?\s`)
+						match = testlista.ReplaceAllString(match, "[Playlist]")
+
+						if strings.Contains(match, "[Playlist]") {
+
+							match = strings.ReplaceAll(match, "[Playlist]", "")
+							match = fmt.Sprintf("%s [Playlist]", match)
+
+						}
+
+						match = strings.TrimPrefix(match, "?list=")
+						match = removeFirstAlphanumeric(match)
+						match = strings.TrimSpace(match)
+						mecze = append(mecze, match)
+						videos[match] = link
+						video = video + 1
+						dlugosc += 1
+						//fmt.Println(len(mecze))
+						//fmt.Println(dlugosc)
+
+					}
+				}
+			}
+
 		} else {
 			// notatka ze przeciez mam jeszcze ta mape co przy robieniu history sie zrobila
 			// dobra tu mam mapke filmikow wiec pewnie trzeba zrobic zeby liczylo ile ma elementow i na tej podstawie dostosowac dlugosc w opisie frameworka

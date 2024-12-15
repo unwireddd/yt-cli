@@ -3,6 +3,8 @@
 // JUTRO PIERWSZE CO ZROBIC TO OGARNAC COMMITOWANIE NA GH
 // generalnie usuwanie kanalow wyglada na naprawione wiec teraz kolejnym priorytetem jest zrobienie wiekszej liczby filmikow ktore beda sie ladowac
 
+// ten projekt jak cos to jest Projekty/yt-cli
+
 package main
 
 import (
