@@ -52,6 +52,7 @@ var testowaniedrugiejrzeczy string
 var isReplaying bool
 var linkForReplays string
 var globalRmTest string
+var isVideoLoading bool
 
 var (
 	focusedStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
@@ -427,50 +428,56 @@ func (m *modeltwo) View() string {
 	// a moze to to updatea trzeba przeniesc czy cos
 	// z testow wynika ze m.choice tutaj w ogole jeszcze nie mam tez ma to w sumie sens bo przeciez m.choice to jest to co wybralem w kanalach
 
-	link, ok = videos[m.choice]
+	if m.choice == "Load all videos" {
+		isVideoLoading = true
 
-	//fmt.Println(videos[m.choice])
-	//globaltest = m.choice
-	/*fmt.Println("The globaltest variable")
-	//fmt.Println(globaltest)
-	fmt.Println(m.choice)
-	fmt.Println("tests end")*/
+	} else {
 
-	m.choice = ""
+		link, ok = videos[m.choice]
 
-	// to jest do zapisywania historii
+		//fmt.Println(videos[m.choice])
+		//globaltest = m.choice
+		/*fmt.Println("The globaltest variable")
+		//fmt.Println(globaltest)
+		fmt.Println(m.choice)
+		fmt.Println("tests end")*/
 
-	// dobra czyli tutaj zamysl jest taki zeby przed tym jak to doda do historii to przeskanowac to cale i wywalic wszystkie duplikaty i wtedy powinno dzialac
-	for key, value := range videos {
-		if value == link {
-			combinated := fmt.Sprintf("%s [Line break here] %s\n", key, link)
-			historyCleanup(combinated)
-			file, err := os.OpenFile(filePath, os.O_APPEND|os.O_WRONLY, 0644)
-			if err != nil {
-				panic(err)
-			}
-			defer file.Close()
+		m.choice = ""
 
-			_, err = io.WriteString(file, combinated)
-			if err != nil {
-				panic(err)
+		// to jest do zapisywania historii
+
+		// dobra czyli tutaj zamysl jest taki zeby przed tym jak to doda do historii to przeskanowac to cale i wywalic wszystkie duplikaty i wtedy powinno dzialac
+		for key, value := range videos {
+			if value == link {
+				combinated := fmt.Sprintf("%s [Line break here] %s\n", key, link)
+				historyCleanup(combinated)
+				file, err := os.OpenFile(filePath, os.O_APPEND|os.O_WRONLY, 0644)
+				if err != nil {
+					panic(err)
+				}
+				defer file.Close()
+
+				_, err = io.WriteString(file, combinated)
+				if err != nil {
+					panic(err)
+				}
 			}
 		}
-	}
 
-	if ok {
+		if ok {
 
-		linkForReplays = link
+			linkForReplays = link
 
-		testt := exec.Command("mpv", link)
-		testt.Run()
-		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
+			testt := exec.Command("mpv", link)
+			testt.Run()
+			return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
+		}
+		if m.quitting {
+			return quitTextStyle.Render("Don't want to watch? That’s cool.")
+		}
+		// isgb = false
+		// dobra czyli zrobienie tutaj isgb na false tez nie bedzie dzialalo bo tu jak jest q to nastawia isgb na true a potem na koncu sie i tak z tego robi false
 	}
-	if m.quitting {
-		return quitTextStyle.Render("Don't want to watch? That’s cool.")
-	}
-	// isgb = false
-	// dobra czyli zrobienie tutaj isgb na false tez nie bedzie dzialalo bo tu jak jest q to nastawia isgb na true a potem na koncu sie i tak z tego robi false
 
 	return "\n" + m.list.View()
 

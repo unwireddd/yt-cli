@@ -8,6 +8,10 @@ package main
 // dobra czyli moim zdaniem zeby ladowac wiecej filmikow to po linku trzeba sobie wyciagnac z htmla ten link do nastepnej strony po prostu i zrobic to 2 razy
 // btw warto zapamietac ze nie wszystkie kanaly maja wiecej niz 60 filmikow wiec w niektorych nie bedzie w ogole czegos takiego
 
+// dobra czyli zamysl na ladowanie wszystkich filmikow jest tkai ze na poczatku laduje pierwsze 60 i jak jest load all videos to wtedy sie wykonuje to drugie ladowanie jak jest m choice w modeltwo takie i nastawia na true i sie wraca tym goto statementem
+
+// dobra chyba wpadlem na to jak mozna dynamicznie zmieniac liste bierze po prostu i jeszcze raz wyswietla tylko ucina te poprzednie i po kolei dodaje nowe rzeczy
+
 import (
 	"fmt"
 	"maps"
@@ -42,12 +46,17 @@ func removeFirstAlphanumeric(s string) string {
 }
 
 func main() {
+loading:
+	if isVideoLoading {
+		fmt.Println("You are now in the full video loading mode, loading the full video list may take a while")
+	}
 
 	// notatka ze nastawienie na poczatku isgb na false nie dziala ale chyba trzeba cos wlasnie probowac w ta strone
 	howgb = 0
 	isAppending = 0
 
 x2:
+
 	isHistory = false
 
 	// dobra w sumie mozna tez po prostu przeniesc goto statement po dodawaniu kanalow bo na dole sie i tak tylko appenduja rzeczy do pierwszej listy
@@ -216,7 +225,8 @@ x2:
 
 			}
 			// tu sie konczy ta pierwsza petla do dodawania pierwszych 60 filmikow
-			if len(mecze) == 60 {
+
+			if isVideoLoading && len(mecze) == 60 {
 
 				dlugosc := 60
 
@@ -227,6 +237,8 @@ x2:
 				// czyli generalnie teraz wyswietla pierwsze 300 filmikow zamiast 60 ale wolno sie laduje wiec pewnie trzeba zrobic cos w stylu opcji next page ze wtedy dopiero laduje kolejne
 
 				for len(mecze) == dlugosc && len(mecze) < 300 {
+
+					fmt.Println("Fetching videos")
 
 					filmikidwa := atorvid.Find("div", "class", "page-next-container")
 
@@ -284,6 +296,9 @@ x2:
 					}
 				}
 			}
+			mecze = append(mecze, "Load all videos")
+
+			// dobra czyli wedlug mnie to mozna tu zrobic cos takiego ze we frameworku jak m.choice to jest load more videos ktore jest jako int to po prostu wykonuje to drugie parsowanie z gory jeszcze raz tylko ze wszystkimi filmikami
 
 		} else {
 			// notatka ze przeciez mam jeszcze ta mape co przy robieniu history sie zrobila
@@ -378,6 +393,7 @@ x2:
 				fmt.Println("Error running program:", err)
 				os.Exit(1)
 			}
+
 		} else {
 
 			// jak tutaj pozmienialem tego strukture to sie w ogole cos ekstremalnie popsulo bo w ogole sie listy nie wyswietlaly
@@ -466,6 +482,9 @@ x2:
 				if _, err := tea.NewProgram(m.(tea.Model)).Run(); err != nil {
 					fmt.Println("Error running program:", err)
 					os.Exit(1)
+				}
+				if isVideoLoading {
+					goto loading
 				}
 			}
 		}
