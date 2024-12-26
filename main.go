@@ -12,6 +12,8 @@ package main
 
 // dobra chyba wpadlem na to jak mozna dynamicznie zmieniac liste bierze po prostu i jeszcze raz wyswietla tylko ucina te poprzednie i po kolei dodaje nowe rzeczy
 
+// czyli jak juz zrobie to z usuwaniem tych pierwszych 60 to trzeba bedzie tez ponaprawiac te rzeczy ze to sie psuje jak jest isgb itp
+
 import (
 	"fmt"
 	"maps"
@@ -46,7 +48,8 @@ func removeFirstAlphanumeric(s string) string {
 }
 
 func main() {
-loading:
+	isVideoLoading = false
+	//loading:
 	if isVideoLoading {
 		fmt.Println("You are now in the full video loading mode, loading the full video list may take a while")
 	}
@@ -130,15 +133,32 @@ x2:
 		os.Exit(1)
 	}
 
+	ator, _ := soup.Get(link)
+	atorvid := soup.HTMLParse(ator)
+
+	// DZIALA TUTAJ
+
+loading:
+
+	// zeby dzialalo to loading ma byc tutaj i chuj
+
 	if isQuittin == true {
 		return
 	} else {
-
+		//loading:
+		// i jak tutaj daje goto to jest segmentation fault bo nie ma tych poprzednich wartosci
 		// tutaj trzeba zrobic if statement ze jak isHistory jest na false to sie robi to a jak nie to inaczej
+
+		// jak tutaj dalem to z isvideoloading to nie dziala dlatego ze to drugie ladowanie na dole jest zamkniete w jednym ifstatemencie
+		// TUTAJ SKONCZYLEM
 		if !isHistory {
 
-			ator, _ := soup.Get(link)
-			atorvid := soup.HTMLParse(ator)
+			// tu jest pierwsze parsowanie
+			//if !isVideoLoading {
+			// dobra tego ifa na gorze daje tutaj zeby przy load more videos sie te pierwsze 60 nie ladowalo 2 razy
+			// ale w sumie po chuj te zmienne dawac na poczatek jak mozna je dac przed to
+			// tam jak cos sie potem zepsuje to dlatego ze dalem na poczatku zmienne ator i atorvid na publiczne
+
 			// tutaj zeby to segmentation naprawic to trzeba jakis if statement na dole zrobic ze jak nie dziala to wychodzi normalnie
 			// dobra czyli moim zdaniem zeby naprawic segmentatnion to trzeba tutaj dac kolejnego ifa ktory przechodi do calego kodu jak nie ma quita w modelu a jak jest to przechodzi od razu na koniec i konczy program tym samym
 			// also teraz tez wymyslilem ze w sumie to zeby ominac te wszystkie log panic itp to tez mozna cos takiego zrobic
@@ -224,11 +244,22 @@ x2:
 				video = video + 1
 
 			}
+			//}
 			// tu sie konczy ta pierwsza petla do dodawania pierwszych 60 filmikow
+
+			// i tutaj jest load all videos a mozna to zamienic na load more videos i jakos wyswietlic ta liste na nowo tylko z ucietymi filmikami pierwszymi i dodanymi nowymi
+			// ale poki co to najlepiej zaczac od przeniesienia w jakis sposob tego goto
 
 			if isVideoLoading && len(mecze) == 60 {
 
+				// z pomyslow aktualnie to trzeba sprawdzic czy te pierwsze 60 filmikow sie nie wyswietla po prostu 2 razy tam na poczatku i moze sprobowac
+				// na poczatku to ucinac
+
+				// dobra czyli tutaj sie nastawia to ze jak sie kliknie to jest to drugie ladowanie z wszystkimi filmikami
+				//mecze = mecze[:len(mecze)]
+
 				dlugosc := 60
+				dlugoscFilmow := dlugosc + 60
 
 				// dobra czyli teraz dziala w sensie wyswietla sie pierwsze 120 a nie tylko 60 i podejrzewam ze mozna to dac po prostu w jakiejs petli
 
@@ -236,7 +267,7 @@ x2:
 
 				// czyli generalnie teraz wyswietla pierwsze 300 filmikow zamiast 60 ale wolno sie laduje wiec pewnie trzeba zrobic cos w stylu opcji next page ze wtedy dopiero laduje kolejne
 
-				for len(mecze) == dlugosc && len(mecze) < 300 {
+				for len(mecze) == dlugosc && len(mecze) < dlugoscFilmow {
 
 					fmt.Println("Fetching videos")
 
@@ -295,6 +326,12 @@ x2:
 
 					}
 				}
+				// tutaj z jakiegos powodu nie usuwa tych pierwszych 60
+
+			}
+
+			if isVideoLoading {
+				//mecze = mecze[1:]
 			}
 			mecze = append(mecze, "Load all videos")
 
