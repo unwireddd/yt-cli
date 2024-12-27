@@ -328,12 +328,24 @@ loading:
 				}
 				// tutaj z jakiegos powodu nie usuwa tych pierwszych 60
 
+				// dobra czyli teraz jak to goto jest juz zrobione to trzeba zrobic to ucinanie czyli za kazdym razem ma zostawiac tylio to ostatnie 60
+
+				//for {
+				//	fmt.Println("aaaa")
+				//}
+
+				// dobra czyli wyglada na to ze w tym kawalku sie w ogole nie wykonuje nic z jakiegos powodu
+
 			}
 
 			if isVideoLoading {
 				//mecze = mecze[1:]
 			}
+
 			mecze = append(mecze, "Load all videos")
+
+			// czyli tutaj jest taki problem ze to sie niezaleznie od niczego usuwa wiec sie laduje tylko 2 w kolko
+			//mecze = mecze[60:]
 
 			// dobra czyli wedlug mnie to mozna tu zrobic cos takiego ze we frameworku jak m.choice to jest load more videos ktore jest jako int to po prostu wykonuje to drugie parsowanie z gory jeszcze raz tylko ze wszystkimi filmikami
 
