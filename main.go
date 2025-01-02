@@ -1,5 +1,7 @@
 package main
 
+// dobra w sumie wypadaloby dodac tez jakas backup instancje bo widze ze to nadeko to czesciej nie dziala niz dziala
+
 // dobra w takim razie nastepny cel na najblizsze dni to zrobic zeby wiecej filmikow sie ladowalo z kanalu zamiast tylko pierwsze 60 i wyczyscic te wszystkie niepotrzebne komentarze po polsku
 
 // to dlugie ladowanie filmikow jest najprawdopodobniej spowodowane tym ze youtube spowalnie a nie samym kodem
@@ -41,6 +43,7 @@ var isQuittin bool
 var items []list.Item
 var isAppending int
 var checksForGoingBack bool
+var howManyAdded = 61
 
 func removeFirstAlphanumeric(s string) string {
 	re := regexp.MustCompile(`^[a-zA-Z0-9_\-]+`)
@@ -140,6 +143,10 @@ x2:
 
 loading:
 
+	itemstwo = nil
+	// ustawienie tego na nil daje to ze sie te poprzednie usuwaja
+	//mecze = nil
+
 	// zeby dzialalo to loading ma byc tutaj i chuj
 
 	if isQuittin == true {
@@ -152,6 +159,9 @@ loading:
 		// jak tutaj dalem to z isvideoloading to nie dziala dlatego ze to drugie ladowanie na dole jest zamkniete w jednym ifstatemencie
 		// TUTAJ SKONCZYLEM
 		if !isHistory {
+			mecze = nil
+
+			// czyli ogolnie widze ze te dalsze filmiki sie w ogole nie laduja tylko dodaje te z pierwszego ladowania z jakiegos powodu caly czas
 
 			// tu jest pierwsze parsowanie
 			//if !isVideoLoading {
@@ -250,7 +260,17 @@ loading:
 			// i tutaj jest load all videos a mozna to zamienic na load more videos i jakos wyswietlic ta liste na nowo tylko z ucietymi filmikami pierwszymi i dodanymi nowymi
 			// ale poki co to najlepiej zaczac od przeniesienia w jakis sposob tego goto
 
-			if isVideoLoading && len(mecze) == 60 {
+			//isVideoLoading = true
+
+			// czyli poki co to chyba dziala tylko usuwa za duzo filmikow na poczatku
+
+			mecze = append(mecze, "Load all videos")
+
+			if isVideoLoading && len(mecze) == 61 {
+
+				howManyAdded += 60
+
+				// teraz i tak mam pushnieta najnowsza wersje na githuba wiec chce zmienic to w ten sposob zeby bylo tak jak na poczatku kiedy to robilem i sprawdzic czy tam tez sie to laduje w kolko
 
 				// z pomyslow aktualnie to trzeba sprawdzic czy te pierwsze 60 filmikow sie nie wyswietla po prostu 2 razy tam na poczatku i moze sprobowac
 				// na poczatku to ucinac
@@ -258,8 +278,8 @@ loading:
 				// dobra czyli tutaj sie nastawia to ze jak sie kliknie to jest to drugie ladowanie z wszystkimi filmikami
 				//mecze = mecze[:len(mecze)]
 
-				dlugosc := 60
-				dlugoscFilmow := dlugosc + 60
+				dlugosc := 61
+				//dlugoscFilmow := dlugosc + 60
 
 				// dobra czyli teraz dziala w sensie wyswietla sie pierwsze 120 a nie tylko 60 i podejrzewam ze mozna to dac po prostu w jakiejs petli
 
@@ -267,7 +287,9 @@ loading:
 
 				// czyli generalnie teraz wyswietla pierwsze 300 filmikow zamiast 60 ale wolno sie laduje wiec pewnie trzeba zrobic cos w stylu opcji next page ze wtedy dopiero laduje kolejne
 
-				for len(mecze) == dlugosc && len(mecze) < dlugoscFilmow {
+				// czyli z tego co mysle to tutaj na poczatku trzeba zrobic zmienna i jakos to dodawac
+
+				for len(mecze) == dlugosc && len(mecze) < howManyAdded {
 
 					fmt.Println("Fetching videos")
 
@@ -326,6 +348,7 @@ loading:
 
 					}
 				}
+				mecze = mecze[60:]
 				// tutaj z jakiegos powodu nie usuwa tych pierwszych 60
 
 				// dobra czyli teraz jak to goto jest juz zrobione to trzeba zrobic to ucinanie czyli za kazdym razem ma zostawiac tylio to ostatnie 60
@@ -338,11 +361,23 @@ loading:
 
 			}
 
-			if isVideoLoading {
+			/*if isVideoLoading {
 				//mecze = mecze[1:]
 			}
 
 			mecze = append(mecze, "Load all videos")
+			if len(mecze) > 61 {
+				//fmt.Println(mecze)
+				// dobra czyli samo to wykrywa ze jest w sensie widzi jak jest wieksze
+				mecze = mecze[len(mecze)-60:]
+
+				// DOBRA widze problem w sensie to sie laduje po prostu w kolko te pierwsze 60 filmikow wiec pewnie to jest problem z logika tego parsowania na gorze
+
+				fmt.Println(mecze)
+
+				// !!! to chyba realnie zostawia ostatnie 10 filmikow tylko ta lista jest jakos w dziwny sposob robiona
+				// widze ze tutaj to usuwa tylko to wszystko co sie dodalo i zostawia to pierwsze fetchowanie
+			} */
 
 			// czyli tutaj jest taki problem ze to sie niezaleznie od niczego usuwa wiec sie laduje tylko 2 w kolko
 			//mecze = mecze[60:]
@@ -364,6 +399,8 @@ loading:
 			//listHeight = len(videos)
 			// a moze trzeba czesc tego kodu w ogole przeniesc do maina zamiast trzymac we frameworku
 		}
+
+		//mecze = mecze[60:]
 
 		// pierwszy ifstatement z isgb jest tutaj
 		// also moze to jest problem we frameworku trzeba porownac tez z nowa a nie bo w nowej sie tez robi out of range
