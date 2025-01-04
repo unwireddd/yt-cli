@@ -803,5 +803,6 @@ func (m *modelthree) View() string {
 	if m.quitting {
 		return quitTextStyle.Render("Don't want to watch? That’s cool.")
 	}
+
 	return "\n" + m.list.View()
 }
