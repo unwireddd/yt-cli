@@ -793,6 +793,13 @@ func (m *modelthree) View() string {
 		testowanie = m.choice
 		return "ok"
 	}
+
+	if m.choice == "Display comments" {
+		linkForReplays = linkForReplays[23:]
+		linkForReplays = fmt.Sprintf("https://inv.nadeko.net%s&nojs=1", linkForReplays)
+		loadComments(linkForReplays)
+
+	}
 	if m.quitting {
 		return quitTextStyle.Render("Don't want to watch? That’s cool.")
 	}

@@ -35,6 +35,7 @@ func removeFirstAlphanumeric(s string) string {
 }
 
 func main() {
+
 	isVideoLoading = false
 	//loading:
 	if isVideoLoading {
@@ -55,6 +56,7 @@ x2:
 		item("Play next video"),
 		item("Play previous video"),
 		item("Go back to videos list"),
+		item("Display comments"),
 	}
 	var mecze []string
 
@@ -217,6 +219,7 @@ loading:
 				}
 				mecze = mecze[len(mecze)-60:]
 				mecze = append(mecze, "Load all videos")
+				isVideoLoading = false
 
 			}
 
