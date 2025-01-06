@@ -41,6 +41,7 @@ var isReplaying bool
 var linkForReplays string
 var globalRmTest string
 var isVideoLoading bool
+var commentHandlingC = 1
 
 var (
 	focusedStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
@@ -795,8 +796,12 @@ func (m *modelthree) View() string {
 	}
 
 	if m.choice == "Display comments" {
-		linkForReplays = linkForReplays[23:]
-		linkForReplays = fmt.Sprintf("https://inv.nadeko.net%s&nojs=1", linkForReplays)
+
+		if commentHandlingC == 1 {
+			linkForReplays = linkForReplays[23:]
+			linkForReplays = fmt.Sprintf("https://inv.nadeko.net%s&nojs=1", linkForReplays)
+			commentHandlingC--
+		}
 		loadComments(linkForReplays)
 
 	}

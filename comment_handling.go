@@ -17,11 +17,11 @@ type modelc struct {
 	quitting bool
 }
 
-func (m modelc) Init() tea.Cmd {
+func (m *modelc) Init() tea.Cmd {
 	return nil
 }
 
-func (m modelc) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *modelc) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.list.SetWidth(msg.Width)
@@ -29,8 +29,11 @@ func (m modelc) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch keypress := msg.String(); keypress {
-		case "q", "ctrl+c":
-			m.quitting = true
+		case "q":
+			//testowanie = "Go back to videos list"
+			//m.quitting = true
+			return m, tea.Quit
+		case "ctrl+c":
 			return m, tea.Quit
 
 		case "enter":
@@ -47,9 +50,10 @@ func (m modelc) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m modelc) View() string {
+func (m *modelc) View() string {
 	if m.choice != "" {
-		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
+		testowanie = "Play next video"
+		//os.Exit(1)
 	}
 	if m.quitting {
 		return quitTextStyle.Render("Not hungry? That’s cool.")
@@ -59,7 +63,7 @@ func (m modelc) View() string {
 
 func loadComments(url string) {
 
-	//url := "https://inv.nadeko.net/watch?v=Oii2zmEqWVU&nojs=1"
+	soup.Header("User-Agent", "User/Agent")
 
 	resp, err := soup.Get(url)
 	if err != nil {
@@ -68,36 +72,49 @@ func loadComments(url string) {
 
 	doc := soup.HTMLParse(resp)
 
-	comments := doc.Find("div", "id", "comments").HTML()
+	// tutaj error handling warto dodac bo sie wywala jak nie ma komentarzy
 
-	re := regexp.MustCompile(`<p\s+style="white-space:pre-wrap">(.*?)</p>`)
+	// nie usuwac tego na dole bo moze sie jeszcze przydac jak cos
+	if doc.Find("div", "id", "comments").Error != nil {
+		fmt.Println("Invidious ratelimit error has occured ")
 
-	// Find all matches
-	matches := re.FindAllStringSubmatch(comments, -1)
+	} else {
 
-	//re := regexp.MustCompile(`<p>(.*?)</p>`)
+		//if doc.Find("div", "id", "comments") =={0xc0003afb90 div <nil>} {
 
-	//matches := re.FindAllString(comments, -1)
+		//}
 
-	items := []list.Item{}
+		comments := doc.Find("div", "id", "comments").HTML()
 
-	for _, match := range matches {
-		items = append(items, item(match[1]))
-	}
+		re := regexp.MustCompile(`<p\s+style="white-space:pre-wrap">(.*?)</p>`)
 
-	l := list.New(items, itemDelegate{}, 20, listHeight)
-	l.Title = "Comments"
-	l.SetShowStatusBar(false)
-	l.SetFilteringEnabled(false)
-	l.Styles.Title = titleStyle
-	l.Styles.PaginationStyle = paginationStyle
-	l.Styles.HelpStyle = helpStyle
+		matches := re.FindAllStringSubmatch(comments, -1)
 
-	m := modelc{list: l}
+		items := []list.Item{}
 
-	if _, err := tea.NewProgram(m).Run(); err != nil {
-		fmt.Println("Error running program:", err)
-		os.Exit(1)
+		for _, match := range matches {
+			items = append(items, item(match[1]))
+		}
+
+		l := list.New(items, itemDelegate{}, 20, listHeight)
+		l.Title = "Comments"
+		l.SetShowStatusBar(false)
+		l.SetFilteringEnabled(false)
+		l.Styles.Title = titleStyle
+		l.Styles.PaginationStyle = paginationStyle
+		l.Styles.HelpStyle = helpStyle
+
+		m := &modelc{list: l}
+
+		fmt.Println(linkForReplays)
+
+		if _, err := tea.NewProgram(m).Run(); err != nil {
+			fmt.Println("Error running program:", err)
+
+			os.Exit(1)
+		}
+		fmt.Println(linkForReplays)
+
 	}
 
 	// dobra teraz plan jest taki zeby te wszystkie komentarze dac w liste zeby sie ladnie wyswietlalo

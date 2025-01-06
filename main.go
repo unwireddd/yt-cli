@@ -29,12 +29,17 @@ var isAppending int
 var checksForGoingBack bool
 var howManyAdded = 61
 
+//var userAgents map[string]string
+
 func removeFirstAlphanumeric(s string) string {
 	re := regexp.MustCompile(`^[a-zA-Z0-9_\-]+`)
 	return re.ReplaceAllString(s, "")
 }
 
 func main() {
+	//userAgents["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+
+	//Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36")
 
 	isVideoLoading = false
 	//loading:
@@ -102,6 +107,7 @@ x2:
 		os.Exit(1)
 	}
 
+	soup.Header("User-Agent", "User/Agent")
 	ator, _ := soup.Get(link)
 	atorvid := soup.HTMLParse(ator)
 
