@@ -28,6 +28,11 @@ var items []list.Item
 var isAppending int
 var checksForGoingBack bool
 var howManyAdded = 61
+var howManyAddedS = 20
+
+// cel na najblizsze dnie to zrobienie parsowania dla nastepnych stron przy szukaniu
+
+// filmiki sie nie wysietlaja znowu z jakiegos powodu
 
 //var userAgents map[string]string
 
@@ -110,6 +115,7 @@ x2:
 	soup.Header("User-Agent", "User/Agent")
 	ator, _ := soup.Get(link)
 	atorvid := soup.HTMLParse(ator)
+	linkTesting := link
 
 loading:
 
@@ -224,6 +230,76 @@ loading:
 					}
 				}
 				mecze = mecze[len(mecze)-60:]
+				mecze = append(mecze, "Load all videos")
+				isVideoLoading = false
+
+			} else if isVideoLoading && strings.Contains(linkTesting, "search") {
+
+				// tutaj normalnie wykrywa to jak wejde w searcha
+
+				strona := 2
+
+				howManyAddedS += 10
+
+				dlugosc := 20
+
+				for len(mecze) == dlugosc && len(mecze) < howManyAddedS {
+
+					fmt.Println("Fetching videos")
+
+					//filmikidwa := atorvid.Find("div", "class", "page-next-container")
+
+					//kont := filmikidwa.Find("a")
+					//kont2 := kont.Attrs()
+					//sprawdzanie := kont2["href"]
+
+					page := fmt.Sprint("&page=", strona)
+
+					link = fmt.Sprint(linkTesting, page)
+					ator, _ = soup.Get(link)
+					atorvid = soup.HTMLParse(ator)
+					owtput := atorvid.Find("div", "class", "pure-g").HTML()
+					re := regexp.MustCompile(`<a[^>]*>.*?<p dir="auto">.*?</p>.*?</a>`)
+					matches := re.FindAllString(owtput, -1)
+
+					for _, match := range matches {
+
+						match = strings.Replace(match, "<a href=", "", -1)
+						if video < 10 {
+							match = strings.Replace(match, `><p dir="auto">`, "			", -1)
+						} else {
+							match = strings.Replace(match, `><p dir="auto">`, "       ", -1)
+						}
+						match = strings.Replace(match, `</p></a>`, "", -1)
+						match = strings.Replace(match, `"`, "", -1)
+						match = strings.Replace(match, `/`, fmt.Sprintf("https://www.youtube.com/"), -1)
+						cutter := regexp.MustCompile(`https?://[^\s]+`)
+						link := cutter.FindString(match)
+						match = strings.Replace(match, `https://www.youtube.com/`, fmt.Sprintf(""), -1)
+						match = strings.Replace(match, "watch?v=", "", 1)
+
+						testlista := regexp.MustCompile(`\?list=.*?\s`)
+						match = testlista.ReplaceAllString(match, "[Playlist]")
+
+						if strings.Contains(match, "[Playlist]") {
+
+							match = strings.ReplaceAll(match, "[Playlist]", "")
+							match = fmt.Sprintf("%s [Playlist]", match)
+
+						}
+
+						match = strings.TrimPrefix(match, "?list=")
+						match = removeFirstAlphanumeric(match)
+						match = strings.TrimSpace(match)
+						mecze = append(mecze, match)
+						videos[match] = link
+						video = video + 1
+						dlugosc += 1
+						strona += 1
+
+					}
+				}
+				mecze = mecze[len(mecze)-20:]
 				mecze = append(mecze, "Load all videos")
 				isVideoLoading = false
 

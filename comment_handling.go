@@ -76,6 +76,7 @@ func loadComments(url string) {
 
 	// nie usuwac tego na dole bo moze sie jeszcze przydac jak cos
 	if doc.Find("div", "id", "comments").Error != nil {
+		fmt.Println(doc.Find("div", "id", "comments").Error)
 		fmt.Println("Invidious ratelimit error has occured ")
 
 	} else {
