@@ -29,12 +29,23 @@ var isAppending int
 var checksForGoingBack bool
 var howManyAdded = 61
 var howManyAddedS = 20
+var howManySearch = 0
+var strona = 2
 
 // cel na najblizsze dnie to zrobienie parsowania dla nastepnych stron przy szukaniu
 
 // filmiki sie nie wysietlaja znowu z jakiegos powodu
 
 //var userAgents map[string]string
+
+func contains(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+	return false
+}
 
 func removeFirstAlphanumeric(s string) string {
 	re := regexp.MustCompile(`^[a-zA-Z0-9_\-]+`)
@@ -235,15 +246,18 @@ loading:
 
 			} else if isVideoLoading && strings.Contains(linkTesting, "search") {
 
-				// tutaj normalnie wykrywa to jak wejde w searcha
+				fmt.Println(len(mecze))
 
-				strona := 2
+				// tutaj normalnie wykrywa to jak wejde w searcha
 
 				howManyAddedS += 10
 
-				dlugosc := 20
+				dlugosc := 20 + howManySearch
+
+				// generalnie to powinno dzialac przy dodaniu tego jednego load all videos do pozniejszego ladowania
 
 				for len(mecze) == dlugosc && len(mecze) < howManyAddedS {
+					// tutaj za pierwszym razem dziala ale za drugim juz nie spelnia tych warunkow u gory
 
 					fmt.Println("Fetching videos")
 
@@ -294,14 +308,19 @@ loading:
 						mecze = append(mecze, match)
 						videos[match] = link
 						video = video + 1
-						dlugosc += 1
-						strona += 1
 
 					}
 				}
 				mecze = mecze[len(mecze)-20:]
-				mecze = append(mecze, "Load all videos")
+				if !contains(mecze, "Load all videos") {
+					mecze = append(mecze, "Load all videos")
+				}
 				isVideoLoading = false
+				if howManySearch < 21 {
+					howManySearch += 1
+				}
+				strona += 1
+				dlugosc += 1
 
 			}
 
