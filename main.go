@@ -32,7 +32,9 @@ var howManyAddedS = 20
 var howManySearch = 0
 var strona = 2
 
-// cel na najblizsze dnie to zrobienie parsowania dla nastepnych stron przy szukaniu
+// i co teraz pewnie zeby naprawic reszte bugow to trzeba pokombinowac z zerowaniem wszystkiego po kazdej opcji
+
+// cel na najblizsze dni to zrobienie parsowania dla nastepnych stron przy szukaniu
 
 // filmiki sie nie wysietlaja znowu z jakiegos powodu
 
@@ -70,6 +72,7 @@ func main() {
 x2:
 
 	isHistory = false
+	isVideoLoading = false
 
 	var m tea.Model
 	itemsthree := []list.Item{
@@ -253,70 +256,80 @@ loading:
 				howManyAddedS += 10
 
 				dlugosc := 20 + howManySearch
+				fmt.Println(dlugosc)
 
 				// generalnie to powinno dzialac przy dodaniu tego jednego load all videos do pozniejszego ladowania
+				if len(mecze) == dlugosc {
 
-				for len(mecze) == dlugosc && len(mecze) < howManyAddedS {
-					// tutaj za pierwszym razem dziala ale za drugim juz nie spelnia tych warunkow u gory
+					if len(mecze) < howManyAddedS {
+						for len(mecze) == dlugosc && len(mecze) < howManyAddedS {
+							// tutaj za pierwszym razem dziala ale za drugim juz nie spelnia tych warunkow u gory
 
-					fmt.Println("Fetching videos")
+							fmt.Println("Fetching videos")
 
-					//filmikidwa := atorvid.Find("div", "class", "page-next-container")
+							//filmikidwa := atorvid.Find("div", "class", "page-next-container")
 
-					//kont := filmikidwa.Find("a")
-					//kont2 := kont.Attrs()
-					//sprawdzanie := kont2["href"]
+							//kont := filmikidwa.Find("a")
+							//kont2 := kont.Attrs()
+							//sprawdzanie := kont2["href"]
 
-					page := fmt.Sprint("&page=", strona)
+							page := fmt.Sprint("&page=", strona)
 
-					link = fmt.Sprint(linkTesting, page)
-					ator, _ = soup.Get(link)
-					atorvid = soup.HTMLParse(ator)
-					owtput := atorvid.Find("div", "class", "pure-g").HTML()
-					re := regexp.MustCompile(`<a[^>]*>.*?<p dir="auto">.*?</p>.*?</a>`)
-					matches := re.FindAllString(owtput, -1)
+							link = fmt.Sprint(linkTesting, page)
+							ator, _ = soup.Get(link)
+							atorvid = soup.HTMLParse(ator)
+							owtput := atorvid.Find("div", "class", "pure-g").HTML()
+							re := regexp.MustCompile(`<a[^>]*>.*?<p dir="auto">.*?</p>.*?</a>`)
+							matches := re.FindAllString(owtput, -1)
 
-					for _, match := range matches {
+							for _, match := range matches {
 
-						match = strings.Replace(match, "<a href=", "", -1)
-						if video < 10 {
-							match = strings.Replace(match, `><p dir="auto">`, "			", -1)
-						} else {
-							match = strings.Replace(match, `><p dir="auto">`, "       ", -1)
+								match = strings.Replace(match, "<a href=", "", -1)
+								if video < 10 {
+									match = strings.Replace(match, `><p dir="auto">`, "			", -1)
+								} else {
+									match = strings.Replace(match, `><p dir="auto">`, "       ", -1)
+								}
+								match = strings.Replace(match, `</p></a>`, "", -1)
+								match = strings.Replace(match, `"`, "", -1)
+								match = strings.Replace(match, `/`, fmt.Sprintf("https://www.youtube.com/"), -1)
+								cutter := regexp.MustCompile(`https?://[^\s]+`)
+								link := cutter.FindString(match)
+								match = strings.Replace(match, `https://www.youtube.com/`, fmt.Sprintf(""), -1)
+								match = strings.Replace(match, "watch?v=", "", 1)
+
+								testlista := regexp.MustCompile(`\?list=.*?\s`)
+								match = testlista.ReplaceAllString(match, "[Playlist]")
+
+								if strings.Contains(match, "[Playlist]") {
+
+									match = strings.ReplaceAll(match, "[Playlist]", "")
+									match = fmt.Sprintf("%s [Playlist]", match)
+
+								}
+
+								match = strings.TrimPrefix(match, "?list=")
+								match = removeFirstAlphanumeric(match)
+								match = strings.TrimSpace(match)
+								mecze = append(mecze, match)
+								videos[match] = link
+								video = video + 1
+
+							}
 						}
-						match = strings.Replace(match, `</p></a>`, "", -1)
-						match = strings.Replace(match, `"`, "", -1)
-						match = strings.Replace(match, `/`, fmt.Sprintf("https://www.youtube.com/"), -1)
-						cutter := regexp.MustCompile(`https?://[^\s]+`)
-						link := cutter.FindString(match)
-						match = strings.Replace(match, `https://www.youtube.com/`, fmt.Sprintf(""), -1)
-						match = strings.Replace(match, "watch?v=", "", 1)
-
-						testlista := regexp.MustCompile(`\?list=.*?\s`)
-						match = testlista.ReplaceAllString(match, "[Playlist]")
-
-						if strings.Contains(match, "[Playlist]") {
-
-							match = strings.ReplaceAll(match, "[Playlist]", "")
-							match = fmt.Sprintf("%s [Playlist]", match)
-
-						}
-
-						match = strings.TrimPrefix(match, "?list=")
-						match = removeFirstAlphanumeric(match)
-						match = strings.TrimSpace(match)
-						mecze = append(mecze, match)
-						videos[match] = link
-						video = video + 1
-
+					} else {
+						fmt.Println("Condition len(mecze) < howManyAddedS not met")
 					}
+				} else {
+					fmt.Println("Condition len(mecze) == dlugosc not met")
 				}
+
 				mecze = mecze[len(mecze)-20:]
 				if !contains(mecze, "Load all videos") {
 					mecze = append(mecze, "Load all videos")
 				}
 				isVideoLoading = false
-				if howManySearch < 21 {
+				if howManySearch < 1 {
 					howManySearch += 1
 				}
 				strona += 1

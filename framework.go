@@ -390,6 +390,7 @@ func (m *modeltwo) View() string {
 		isVideoLoading = true
 
 	} else {
+		//isVideoLoading = false
 
 		link, ok = videos[m.choice]
 
